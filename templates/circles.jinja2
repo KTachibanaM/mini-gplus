@@ -20,6 +20,11 @@
                 {{ circle.name }}
                 <input type="hidden" name="id" value="{{ circle.id }}" readonly>
                 <input type="submit" value="Remove circle">
+                <ul>
+                    {% for member in circle.members %}
+                        <li>{{ member.user_id }}</li>
+                    {% endfor %}
+                </ul>
             </form>
         </li>
     {% endfor %}

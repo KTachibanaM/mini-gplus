@@ -17,7 +17,7 @@
 </form>
 <ul>
     {% for post in posts %}
-        <li>{{ post.content }}</li>
+        <li>{{ post.author.user_id }}: {{ post.content }}</li>
     {% endfor %}
 </ul>
 </body>

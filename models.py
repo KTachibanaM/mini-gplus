@@ -8,7 +8,7 @@ class User(Document, UserMixin):
 
 
 class Circle(Document):
-    owner = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)
+    owner = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
     name = StringField(required=True)
     members = ListField(ReferenceField(User, reverse_delete_rule=PULL), default=[])  # type: list[User]
     meta = {
@@ -23,12 +23,12 @@ class Circle(Document):
 
 class Comment(Document):
     content = StringField(required=True)
-    author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)
+    author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
 
 
 class Post(Document):
-    author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)
+    author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
     content = StringField(required=True)
     is_public = BooleanField(required=True)
-    circles = ListField(ReferenceField(Circle, reverse_delete_rule=PULL), default=[])
-    comments = ListField(ReferenceField(Comment, reverse_delete_rule=PULL), default=[])
+    circles = ListField(ReferenceField(Circle, reverse_delete_rule=PULL), default=[])  # type: list[Circle]
+    comments = ListField(ReferenceField(Comment, reverse_delete_rule=PULL), default=[])  # type: list[Comment]
