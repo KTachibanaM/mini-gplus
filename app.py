@@ -81,13 +81,13 @@ def circles():
     create_new_circle_form = CreateNewCircleForm(request.form)
     if request.method == 'POST' and create_new_circle_form.validate():
         new_circle_name = create_new_circle_form.name.data
-        if Circle.objects(owner=current_user.id, name=new_circle_name):
-            create_new_circle_form.name.errors.append('Circle {} already exists'.format(new_circle_name))
-        else:
+        try:
             new_circle = Circle()
             new_circle.owner = current_user.id
             new_circle.name = new_circle_name
             new_circle.save()
+        except NotUniqueError:
+            create_new_circle_form.name.errors.append('Circle {} already exists'.format(new_circle_name))
     return render_template('circles.jinja2', form=create_new_circle_form, circles=Circle.objects(owner=current_user.id))
 
 if __name__ == '__main__':
