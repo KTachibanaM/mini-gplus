@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, abort
 from mongoengine import NotUniqueError
 from flask_mongoengine import MongoEngine
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm
 from models import User
 from utils import is_safe_url
@@ -26,38 +26,48 @@ def load_user(id):
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    form = SigninForm(request.form)
-    if request.method == 'POST' and form.validate():
-        users = User.objects(user_id=form.id.data, password=form.password.data)
-        if not users:
-            form.id.errors.append('Wrong id or password')
-            form.password.errors.append('Wrong id or password')
-        elif len(users) > 1:
-            return abort(500)
-        else:
-            login_user(users[0], remember=True)
-            next = request.args.get('next')
-            if not is_safe_url(next):
-                return abort(400)
-            return 'logged in!'
-    return render_template('signin.jinja2', form=form)
+    if not current_user.is_authenticated:
+        signin_form = SigninForm(request.form)
+        if request.method == 'POST' and signin_form.validate():
+            users = User.objects(user_id=signin_form.id.data, password=signin_form.password.data)
+            if not users:
+                signin_form.id.errors.append('Wrong id or password')
+                signin_form.password.errors.append('Wrong id or password')
+            elif len(users) > 1:
+                return abort(500)
+            else:
+                login_user(users[0], remember=True)
+                next = request.args.get('next')
+                if not is_safe_url(next):
+                    return abort(400)
+                return redirect(url_for('index'))
+        return render_template('signin.jinja2', form=signin_form)
+    else:
+        return render_template('index.jinja2')
 
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    form = SignupForm(request.form)
-    if request.method == 'POST' and form.validate():
+    signup_form = SignupForm(request.form)
+    if request.method == 'POST' and signup_form.validate():
         new_user = User()
-        new_user.user_id = form.id.data
-        new_user.password = form.password.data
+        new_user.user_id = signup_form.id.data
+        new_user.password = signup_form.password.data
         try:
             new_user.save()
         except NotUniqueError:
-            form.id.errors.append('id {} is already taken'.format(form.id.data))
-            return render_template('signup.jinja2', form=form)
+            signup_form.id.errors.append('id {} is already taken'.format(signup_form.id.data))
+            return render_template('signup.jinja2', form=signup_form)
         return redirect(url_for('index'))
     else:
-        return render_template('signup.jinja2', form=form)
+        return render_template('signup.jinja2', form=signup_form)
+
+
+@app.route('/signout')
+@login_required
+def signout():
+    logout_user()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run()
