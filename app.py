@@ -87,5 +87,13 @@ def circles():
             create_new_circle_form.name.errors.append('Circle {} already exists'.format(new_circle_name))
     return render_template('circles.jinja2', form=create_new_circle_form, circles=Circle.objects(owner=current_user.id))
 
+
+@app.route('/rmcircle', methods=['POST'])
+@login_required
+def rm_circle():
+    Circle.objects.get(id=request.form.get('id')).delete()
+    return redirect(url_for('circles'))
+
+
 if __name__ == '__main__':
     app.run()

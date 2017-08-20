@@ -9,13 +9,19 @@
 <nav>
     {{ header('/circles') }} | Hi {{ current_user.user_id }} <a href="/signout">Signout</a>
 </nav>
-<form method=post>
+<form method='post'>
     {{ field(form.name) }}
-    <input type=submit value='Create new circle'>
+    <input type='submit' value='Create new circle'>
 </form>
 <ul>
     {% for circle in circles %}
-        <li>{{ circle.name }}</li>
+        <li>
+            <form method="post" action="/rmcircle">
+                {{ circle.name }}
+                <input type="hidden" name="id" value="{{ circle.id }}" readonly>
+                <input type="submit" value="Remove circle">
+            </form>
+        </li>
     {% endfor %}
 </ul>
 </body>
