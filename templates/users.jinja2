@@ -10,7 +10,16 @@
 </nav>
 <ul>
     {% for user in users %}
-        <li>{{ user.user_id }}</li>
+        <li>{{ user.user_id }} |
+            {% for circle in circles %}
+                <form method="post" action="/togglemember" style="display: inline">
+                    {{ circle.name }}
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <input type="hidden" name="circle_id" value="{{ circle.id }}">
+                    <input type="submit" value="{{ '-' if circle.is_member(user) else '+' }}">
+                </form> |
+            {% endfor %}
+        </li>
     {% endfor %}
 </ul>
 </body>

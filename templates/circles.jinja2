@@ -16,7 +16,7 @@
 <ul>
     {% for circle in circles %}
         <li>
-            <form method="post" action="/rmcircle">
+            <form method="post" action="/rmcircle" style="display: inline">
                 {{ circle.name }}
                 <input type="hidden" name="id" value="{{ circle.id }}" readonly>
                 <input type="submit" value="Remove circle">

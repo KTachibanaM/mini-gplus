@@ -10,12 +10,15 @@ class User(Document, UserMixin):
 class Circle(Document):
     owner = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)
     name = StringField(required=True)
-    members = ListField(ReferenceField(User, reverse_delete_rule=PULL), default=[])
+    members = ListField(ReferenceField(User, reverse_delete_rule=PULL), default=[])  # type: list[User]
     meta = {
         'indexes': [
             {'fields': ('owner', 'name'), 'unique': True}
         ]
     }
+
+    def is_member(self, user):
+        return filter(lambda member: member.id == user.id, self.members)
 
 
 class Comment(Document):

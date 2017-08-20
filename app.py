@@ -69,7 +69,11 @@ def signout():
 @app.route('/users')
 @login_required
 def users():
-    return render_template('users.jinja2', users=User.objects(id__ne=current_user.id))
+    return render_template(
+        'users.jinja2',
+        users=User.objects(id__ne=current_user.id),
+        circles=Circle.objects(owner=current_user.id)
+    )
 
 
 @app.route('/circles', methods=['GET', 'POST'])
@@ -86,6 +90,18 @@ def circles():
         except NotUniqueError:
             create_new_circle_form.name.errors.append('Circle {} already exists'.format(new_circle_name))
     return render_template('circles.jinja2', form=create_new_circle_form, circles=Circle.objects(owner=current_user.id))
+
+
+@app.route('/togglemember', methods=['POST'])
+def toggle_member():
+    circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
+    user = User.objects.get(id=request.form.get('user_id'))
+    if circle.is_member(user):
+        circle.members.remove(user)
+    else:
+        circle.members.append(user)
+    circle.save()
+    return redirect(url_for('users'))
 
 
 @app.route('/rmcircle', methods=['POST'])
