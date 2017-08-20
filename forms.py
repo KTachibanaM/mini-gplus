@@ -11,3 +11,12 @@ class SignupForm(Form):
         validators.EqualTo('confirm_password', message='Passwords must match')
     ])
     confirm_password = PasswordField('Repeat Password')
+
+
+class SigninForm(Form):
+    id = StringField('id', [
+        validators.DataRequired()
+    ])
+    password = PasswordField('Password', [
+        validators.DataRequired()
+    ])

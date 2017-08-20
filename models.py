@@ -1,4 +1,5 @@
 from mongoengine import Document, ListField, BooleanField, ReferenceField, StringField, PULL, NULLIFY, CASCADE
+from flask_login import UserMixin
 
 
 class Circle(Document):
@@ -6,7 +7,7 @@ class Circle(Document):
     members = ListField(ReferenceField('User'), default=[])
 
 
-class User(Document):
+class User(Document, UserMixin):
     user_id = StringField(required=True, unique=True)
     password = StringField(required=True)
     circles = ListField(ReferenceField('Circle'), default=[])
