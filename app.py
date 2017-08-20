@@ -2,8 +2,8 @@ from flask import Flask, request, render_template, redirect, url_for, abort
 from mongoengine import NotUniqueError
 from flask_mongoengine import MongoEngine
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
-from forms import SignupForm, SigninForm
-from models import User
+from forms import SignupForm, SigninForm, CreateNewCircleForm
+from models import User, Circle
 from utils import is_safe_url
 from os import urandom
 
@@ -57,10 +57,9 @@ def signup():
             new_user.save()
         except NotUniqueError:
             signup_form.id.errors.append('id {} is already taken'.format(signup_form.id.data))
-            return render_template('signup.jinja2', form=signup_form)
-        return redirect(url_for('index'))
-    else:
-        return render_template('signup.jinja2', form=signup_form)
+        else:
+            return redirect(url_for('index'))
+    return render_template('signup.jinja2', form=signup_form)
 
 
 @app.route('/signout')
@@ -76,10 +75,20 @@ def users():
     return render_template('users.jinja2', users=User.objects())
 
 
-@app.route('/circles')
+@app.route('/circles', methods=['GET', 'POST'])
 @login_required
 def circles():
-    return render_template('circles.jinja2')
+    create_new_circle_form = CreateNewCircleForm(request.form)
+    if request.method == 'POST' and create_new_circle_form.validate():
+        new_circle_name = create_new_circle_form.name.data
+        if Circle.objects(owner=current_user.id, name=new_circle_name):
+            create_new_circle_form.name.errors.append('Circle {} already exists'.format(new_circle_name))
+        else:
+            new_circle = Circle()
+            new_circle.owner = current_user.id
+            new_circle.name = new_circle_name
+            new_circle.save()
+    return render_template('circles.jinja2', form=create_new_circle_form, circles=Circle.objects(owner=current_user.id))
 
 if __name__ == '__main__':
     app.run()

@@ -1,4 +1,5 @@
 {% from "_header.jinja2" import header %}
+{% from "_formhelpers.jinja2" import render_field %}
 
 <html>
 <head>
@@ -8,6 +9,16 @@
 <nav>
     {{ header('/circles') }} | Hi {{ current_user.user_id }} <a href="/signout">Signout</a>
 </nav>
-TBD
+<form method=post>
+    <dl>
+        {{render_field(form.name)}}
+    </dl>
+    <p><input type=submit value='Create new circle'>
+</form>
+<ul>
+    {% for circle in circles %}
+        <li>{{ circle.name }}</li>
+    {% endfor %}
+</ul>
 </body>
 </html>

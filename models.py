@@ -3,6 +3,7 @@ from flask_login import UserMixin
 
 
 class Circle(Document):
+    owner = ReferenceField('User', required=True)
     name = StringField(required=True)
     members = ListField(ReferenceField('User'), default=[])
 
@@ -10,8 +11,7 @@ class Circle(Document):
 class User(Document, UserMixin):
     user_id = StringField(required=True, unique=True)
     password = StringField(required=True)
-    circles = ListField(ReferenceField('Circle'), default=[])
-    posts = ListField(ReferenceField('Post'), default=[])
+    posts = ListField(ReferenceField('Post'), default=[])  # type: list[Post]
 
 
 class Post(Document):
@@ -26,9 +26,9 @@ class Comment(Document):
     user = ReferenceField('User', required=True)
 
 
+Circle.register_delete_rule(Circle, 'owner', CASCADE)
 Circle.register_delete_rule(Circle, 'members', PULL)
-Circle.register_delete_rule(User, 'circles', PULL)
-Circle.register_delete_rule(User, 'posts', PULL)
-Circle.register_delete_rule(Post, 'circle', NULLIFY)
-Circle.register_delete_rule(Post, 'comments', PULL)
-Circle.register_delete_rule(Comment, 'user', CASCADE)
+User.register_delete_rule(User, 'posts', PULL)
+Post.register_delete_rule(Post, 'circle', NULLIFY)
+Post.register_delete_rule(Post, 'comments', PULL)
+Comment.register_delete_rule(Comment, 'user', CASCADE)

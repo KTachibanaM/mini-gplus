@@ -20,3 +20,9 @@ class SigninForm(Form):
     password = PasswordField('Password', [
         validators.DataRequired()
     ])
+
+
+class CreateNewCircleForm(Form):
+    name = StringField('New circle name', [
+        validators.DataRequired()
+    ])
