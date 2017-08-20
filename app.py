@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, redirect, url_for, abort
-from mongoengine import NotUniqueError
+from mongoengine import NotUniqueError, Q
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
@@ -50,7 +50,19 @@ def index():
             new_post.is_public = create_new_post_form.is_public.data
             new_post.circles = create_new_post_form.circles.data
             new_post.save()
-        return render_template('index.jinja2', form=create_new_post_form)
+
+        def is_accessible(post):
+            if post.author.id == current_user.id:
+                return True
+            elif post.is_public:
+                return True
+            else:
+                for circle in post.circles:
+                    if circle.is_member(current_user):
+                        return True
+            return False
+
+        return render_template('index.jinja2', form=create_new_post_form, posts=filter(is_accessible, Post.objects()))
 
 
 @app.route('/signup', methods=['GET', 'POST'])

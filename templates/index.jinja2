@@ -15,6 +15,10 @@
     {{ field(form.circles) }}
     <input type='submit' value='Create new post'>
 </form>
-Nothing in the stream yet...
+<ul>
+    {% for post in posts %}
+        <li>{{ post.content }}</li>
+    {% endfor %}
+</ul>
 </body>
 </html>
