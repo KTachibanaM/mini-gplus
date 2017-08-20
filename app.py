@@ -3,7 +3,7 @@ from mongoengine import NotUniqueError, Q
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
-from models import User, Circle, Post
+from models import User, Circle, Post, Comment
 from utils import is_safe_url
 from os import urandom
 
@@ -51,18 +51,7 @@ def index():
             new_post.circles = create_new_post_form.circles.data
             new_post.save()
 
-        def is_accessible(post):
-            if post.author.id == current_user.id:
-                return True
-            elif post.is_public:
-                return True
-            else:
-                for circle in post.circles:
-                    if circle.is_member(current_user):
-                        return True
-            return False
-
-        posts = filter(is_accessible, Post.objects())
+        posts = filter(lambda post: post.shared_with(current_user), Post.objects())
         posts = reversed(sorted(posts, key=lambda post: post.created_at))
         return render_template('index.jinja2', form=create_new_post_form, posts=posts)
 
@@ -73,6 +62,20 @@ def rm_post():
     post = Post.objects.get(id=request.form.get('id'))
     if post.author.id == current_user.id:
         post.delete()
+    return redirect(url_for('index'))
+
+
+@app.route('/addcomment', methods=['POST'])
+@login_required
+def add_comment():
+    post = Post.objects.get(id=request.form.get('post_id'))
+    if post.shared_with(current_user):
+        new_comment = Comment()
+        new_comment.author = current_user.id
+        new_comment.content = request.form.get('content')
+        new_comment.save()
+        post.comments.append(new_comment)
+        post.save()
     return redirect(url_for('index'))
 
 

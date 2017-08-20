@@ -29,8 +29,17 @@
             {% endif %}
             <ul>
                 {% for comment in post.comments %}
-                    {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
+                    <li>
+                        {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
+                    </li>
                 {% endfor %}
+                <li>
+                    <form method="post" action="/addcomment">
+                        <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
+                        <input name="content">
+                        <input type="submit" value="Comment">
+                    </form>
+                </li>
             </ul>
         </li>
     {% endfor %}

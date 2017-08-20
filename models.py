@@ -28,8 +28,8 @@ class Circle(Document):
 
 
 class Comment(Document, CreatedAtMixin):
-    content = StringField(required=True)
     author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
+    content = StringField(required=True)
 
 
 class Post(Document, CreatedAtMixin):
@@ -38,6 +38,17 @@ class Post(Document, CreatedAtMixin):
     is_public = BooleanField(required=True)
     circles = ListField(ReferenceField(Circle, reverse_delete_rule=PULL), default=[])  # type: list[Circle]
     comments = ListField(ReferenceField(Comment, reverse_delete_rule=PULL), default=[])  # type: list[Comment]
+
+    def shared_with(self, user):
+        if self.author.id == user.id:
+            return True
+        elif self.is_public:
+            return True
+        else:
+            for circle in self.circles:
+                if circle.is_member(user):
+                    return True
+        return False
 
     @property
     def sharing_scope_str(self):
