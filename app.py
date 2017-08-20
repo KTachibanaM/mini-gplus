@@ -17,11 +17,7 @@ db = MongoEngine(app)
 
 @login_manager.user_loader
 def load_user(loaded_id):
-    found_users = User.objects(id=loaded_id)
-    if len(found_users) == 1:
-        return found_users[0]
-    else:
-        return None
+    return User.objects.get(id=loaded_id)
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -72,7 +68,7 @@ def signout():
 @app.route('/users')
 @login_required
 def users():
-    return render_template('users.jinja2', users=User.objects())
+    return render_template('users.jinja2', users=User.objects(id__ne=current_user.id))
 
 
 @app.route('/circles', methods=['GET', 'POST'])
