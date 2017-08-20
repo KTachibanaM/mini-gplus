@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, abort
 from mongoengine import NotUniqueError
-from flask_mongoengine import MongoEngine
+from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm
 from models import User, Circle
@@ -13,6 +13,7 @@ login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.init_app(app)
 db = MongoEngine(app)
+app.session_interface = MongoEngineSessionInterface(db)
 
 
 @login_manager.user_loader
