@@ -32,3 +32,11 @@ class Post(Document):
     is_public = BooleanField(required=True)
     circles = ListField(ReferenceField(Circle, reverse_delete_rule=PULL), default=[])  # type: list[Circle]
     comments = ListField(ReferenceField(Comment, reverse_delete_rule=PULL), default=[])  # type: list[Comment]
+
+    def sharing_scope_str(self):
+        if self.is_public:
+            return '(public)'
+        elif self.circles:
+            return ', '.join(map(lambda circle: circle.name, self.circles))
+        else:
+            return '(private)'

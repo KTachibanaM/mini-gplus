@@ -17,7 +17,17 @@
 </form>
 <ul>
     {% for post in posts %}
-        <li>{{ post.author.user_id }}: {{ post.content }}</li>
+        <li>
+            {% if post.author.id == current_user.id %}
+                <form method="post" action="/rmpost" style="display: inline">
+                    {{ post.author.user_id }} -> {{ post.sharing_scope_str() }}: {{ post.content }}
+                    <input type="hidden" name="id" value="{{ post.id }}" readonly>
+                    <input type="submit" value="Delete post">
+                </form>
+            {% else %}
+                {{ post.author.user_id }}: {{ post.content }}
+            {% endif %}
+        </li>
     {% endfor %}
 </ul>
 </body>

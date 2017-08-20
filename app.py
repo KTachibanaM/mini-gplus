@@ -65,6 +65,15 @@ def index():
         return render_template('index.jinja2', form=create_new_post_form, posts=filter(is_accessible, Post.objects()))
 
 
+@app.route('/rmpost', methods=['POST'])
+@login_required
+def rm_post():
+    post = Post.objects.get(id=request.form.get('id'))
+    if post.author.id == current_user.id:
+        post.delete()
+    return redirect(url_for('index'))
+
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     signup_form = SignupForm(request.form)
@@ -129,7 +138,9 @@ def toggle_member():
 @app.route('/rmcircle', methods=['POST'])
 @login_required
 def rm_circle():
-    Circle.objects.get(id=request.form.get('id')).delete()
+    circle = Circle.objects.get(id=request.form.get('id'))
+    if circle.owner.id == current_user.id:
+        circle.delete()
     return redirect(url_for('circles'))
 
 
