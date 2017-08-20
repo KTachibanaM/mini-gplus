@@ -62,7 +62,9 @@ def index():
                         return True
             return False
 
-        return render_template('index.jinja2', form=create_new_post_form, posts=filter(is_accessible, Post.objects()))
+        posts = filter(is_accessible, Post.objects())
+        posts = reversed(sorted(posts, key=lambda post: post.created_at))
+        return render_template('index.jinja2', form=create_new_post_form, posts=posts)
 
 
 @app.route('/rmpost', methods=['POST'])

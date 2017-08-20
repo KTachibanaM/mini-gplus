@@ -1,4 +1,4 @@
-from mongoengine import Document, ListField, BooleanField, ReferenceField, StringField, PULL, NULLIFY, CASCADE
+from mongoengine import Document, ListField, BooleanField, ReferenceField, StringField, PULL, CASCADE
 from flask_login import UserMixin
 
 
@@ -33,6 +33,7 @@ class Post(Document):
     circles = ListField(ReferenceField(Circle, reverse_delete_rule=PULL), default=[])  # type: list[Circle]
     comments = ListField(ReferenceField(Comment, reverse_delete_rule=PULL), default=[])  # type: list[Comment]
 
+    @property
     def sharing_scope_str(self):
         if self.is_public:
             return '(public)'
@@ -40,3 +41,7 @@ class Post(Document):
             return ', '.join(map(lambda circle: circle.name, self.circles))
         else:
             return '(private)'
+
+    @property
+    def created_at(self):
+        return self.id.generation_time
