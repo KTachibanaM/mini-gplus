@@ -79,6 +79,17 @@ def add_comment():
     return redirect(url_for('index'))
 
 
+@app.route('/rmcomment', methods=['POST'])
+@login_required
+def rm_comment():
+    post = Post.objects.get(id=request.form.get('post_id'))
+    comment = Comment.objects.get(id=request.form.get('comment_id'))
+    if comment.can_remove(current_user, post):
+        post.comments.remove(comment)
+        comment.delete()
+    return redirect(url_for('index'))
+
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     signup_form = SignupForm(request.form)

@@ -31,6 +31,9 @@ class Comment(Document, CreatedAtMixin):
     author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
     content = StringField(required=True)
 
+    def can_remove(self, current_user, post):
+        return self.author.id == current_user.id or post.can_remove(current_user)
+
 
 class Post(Document, CreatedAtMixin):
     author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
@@ -39,16 +42,19 @@ class Post(Document, CreatedAtMixin):
     circles = ListField(ReferenceField(Circle, reverse_delete_rule=PULL), default=[])  # type: list[Circle]
     comments = ListField(ReferenceField(Comment, reverse_delete_rule=PULL), default=[])  # type: list[Comment]
 
-    def shared_with(self, user):
-        if self.author.id == user.id:
+    def shared_with(self, current_user):
+        if self.author.id == current_user.id:
             return True
         elif self.is_public:
             return True
         else:
             for circle in self.circles:
-                if circle.is_member(user):
+                if circle.is_member(current_user):
                     return True
         return False
+
+    def can_remove(self, current_user):
+        return self.author.id == current_user.id
 
     @property
     def sharing_scope_str(self):

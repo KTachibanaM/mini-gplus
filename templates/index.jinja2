@@ -18,7 +18,7 @@
 <ul>
     {% for post in posts %}
         <li>
-            {% if post.author.id == current_user.id %}
+            {% if post.can_remove(current_user) %}
                 <form method="post" action="/rmpost" style="display: inline">
                     {{ post.author.user_id }} -> {{ post.sharing_scope_str }} @{{ post.created_at }}: {{ post.content }}
                     <input type="hidden" name="id" value="{{ post.id }}" readonly>
@@ -30,7 +30,16 @@
             <ul>
                 {% for comment in post.comments %}
                     <li>
-                        {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
+                        {% if comment.can_remove(current_user, post) %}
+                            <form method="post" action="/rmcomment" style="display: inline">
+                                {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
+                                <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
+                                <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
+                                <input type="submit" value="Delete">
+                            </form>
+                        {% else %}
+                            {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
+                        {% endif %}
                     </li>
                 {% endfor %}
                 <li>
