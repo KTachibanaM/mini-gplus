@@ -1,4 +1,4 @@
-{% from "_formhelpers.jinja2" import render_field %}
+{% from "_form.jinja2" import field %}
 
 <html>
 <head>
@@ -6,11 +6,9 @@
 </head>
 <body>
 <form method=post>
-    <dl>
-        {{render_field(form.id)}}
-        {{render_field(form.password)}}
-    </dl>
-    <p><input type=submit value='Signin'>
+    {{ field(form.id) }}
+    {{ field(form.password) }}
+    <input type=submit value='Sign in'>
 </form>
 <a href="/signup">Sign up</a>
 </body>
