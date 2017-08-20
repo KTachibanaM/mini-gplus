@@ -16,10 +16,10 @@ db = MongoEngine(app)
 
 
 @login_manager.user_loader
-def load_user(id):
-    users = User.objects(id=id)
-    if len(users) == 1:
-        return users[0]
+def load_user(loaded_id):
+    found_users = User.objects(id=loaded_id)
+    if len(found_users) == 1:
+        return found_users[0]
     else:
         return None
 
@@ -29,16 +29,16 @@ def index():
     if not current_user.is_authenticated:
         signin_form = SigninForm(request.form)
         if request.method == 'POST' and signin_form.validate():
-            users = User.objects(user_id=signin_form.id.data, password=signin_form.password.data)
-            if not users:
+            found_users = User.objects(user_id=signin_form.id.data, password=signin_form.password.data)
+            if not found_users:
                 signin_form.id.errors.append('Wrong id or password')
                 signin_form.password.errors.append('Wrong id or password')
-            elif len(users) > 1:
+            elif len(found_users) > 1:
                 return abort(500)
             else:
-                login_user(users[0], remember=True)
-                next = request.args.get('next')
-                if not is_safe_url(next):
+                login_user(found_users[0], remember=True)
+                next_arg = request.args.get('next')
+                if not is_safe_url(next_arg):
                     return abort(400)
                 return redirect(url_for('index'))
         return render_template('signin.jinja2', form=signin_form)
