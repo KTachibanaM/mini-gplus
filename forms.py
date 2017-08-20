@@ -1,4 +1,6 @@
-from wtforms import Form, StringField, PasswordField, validators
+from wtforms import Form, StringField, BooleanField, PasswordField, validators
+from utils import DataRequiredIf, MultiCheckboxField
+from bson.objectid import ObjectId
 
 
 class SignupForm(Form):
@@ -26,3 +28,13 @@ class CreateNewCircleForm(Form):
     name = StringField('New circle name', [
         validators.DataRequired()
     ])
+
+
+class CreateNewPostForm(Form):
+    content = StringField('New post', [
+        validators.DataRequired()
+    ])
+    is_public = BooleanField('Public')
+    circles = MultiCheckboxField('Circles', [
+        DataRequiredIf(is_public=False)
+    ], ObjectId)

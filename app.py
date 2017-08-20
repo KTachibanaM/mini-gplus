@@ -2,8 +2,8 @@ from flask import Flask, request, render_template, redirect, url_for, abort
 from mongoengine import NotUniqueError
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
-from forms import SignupForm, SigninForm, CreateNewCircleForm
-from models import User, Circle
+from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
+from models import User, Circle, Post
 from utils import is_safe_url
 from os import urandom
 
@@ -40,7 +40,17 @@ def index():
                 return redirect(url_for('index'))
         return render_template('signin.jinja2', form=signin_form)
     else:
-        return render_template('index.jinja2')
+        current_circles = Circle.objects(owner=current_user.id)
+        create_new_post_form = CreateNewPostForm(request.form)
+        create_new_post_form.circles.choices = map(lambda circle: (circle.id, circle.name), current_circles)
+        if request.method == 'POST' and create_new_post_form.validate():
+            new_post = Post()
+            new_post.author = current_user.id
+            new_post.content = create_new_post_form.content.data
+            new_post.is_public = create_new_post_form.is_public.data
+            new_post.circles = create_new_post_form.circles.data
+            new_post.save()
+        return render_template('index.jinja2', form=create_new_post_form)
 
 
 @app.route('/signup', methods=['GET', 'POST'])

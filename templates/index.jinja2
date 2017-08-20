@@ -1,4 +1,5 @@
 {% from "_header.jinja2" import header %}
+{% from "_form.jinja2" import field %}
 
 <html>
 <head>
@@ -8,6 +9,12 @@
 <nav>
     {{ header('/') }} | Hi {{ current_user.user_id }} <a href="/signout">Signout</a>
 </nav>
+<form method="post">
+    {{ field(form.content) }}
+    {{ field(form.is_public) }}
+    {{ field(form.circles) }}
+    <input type='submit' value='Create new post'>
+</form>
 Nothing in the stream yet...
 </body>
 </html>

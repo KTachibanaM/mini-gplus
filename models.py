@@ -28,7 +28,7 @@ class Comment(Document):
 
 class Post(Document):
     author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)
-    is_public = BooleanField(required=True)
-    circle = ReferenceField(Circle, required=True, reverse_delete_rule=NULLIFY)
     content = StringField(required=True)
+    is_public = BooleanField(required=True)
+    circles = ListField(ReferenceField(Circle, reverse_delete_rule=NULLIFY), default=[])
     comments = ListField(ReferenceField(Comment, reverse_delete_rule=PULL), default=[])
