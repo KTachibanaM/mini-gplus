@@ -1,8 +1,13 @@
+{% from "_header.jinja2" import header %}
+
 <html>
 <head>
     <title>mini-gplus</title>
 </head>
 <body>
-Hi {{ current_user.user_id }}! <a href="/signout">Signout</a>
+<nav>
+    {{ header('/') }} | Hi {{ current_user.user_id }} <a href="/signout">Signout</a>
+</nav>
+Nothing in the stream yet...
 </body>
 </html>

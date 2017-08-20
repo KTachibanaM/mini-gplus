@@ -1,0 +1,9 @@
+{% macro header(current_page) %}
+    {% if current_page == '/' %}
+        Stream | <a href="/users">Users</a> | <a href="/circles">Circles</a>
+    {% elif current_page == '/users' %}
+        <a href="/">Stream</a> | Users | <a href="/circles">Circles</a>
+    {% elif current_page == '/circles' %}
+        <a href="/">Stream</a> | <a href="/users">Users</a> | Circles
+    {% endif %}
+{% endmacro %}

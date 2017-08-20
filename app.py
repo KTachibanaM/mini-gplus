@@ -69,5 +69,17 @@ def signout():
     logout_user()
     return redirect(url_for('index'))
 
+
+@app.route('/users')
+@login_required
+def users():
+    return render_template('users.jinja2', users=User.objects())
+
+
+@app.route('/circles')
+@login_required
+def circles():
+    return render_template('circles.jinja2')
+
 if __name__ == '__main__':
     app.run()
