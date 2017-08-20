@@ -126,14 +126,16 @@ def circles():
 
 
 @app.route('/togglemember', methods=['POST'])
+@login_required
 def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
-    user = User.objects.get(id=request.form.get('user_id'))
-    if circle.is_member(user):
-        circle.members.remove(user)
-    else:
-        circle.members.append(user)
-    circle.save()
+    if circle.owner.id == current_user.id:
+        toggled_user = User.objects.get(id=request.form.get('user_id'))
+        if circle.is_member(toggled_user):
+            circle.members.remove(toggled_user)
+        else:
+            circle.members.append(toggled_user)
+        circle.save()
     return redirect(url_for('users'))
 
 

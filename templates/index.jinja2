@@ -27,6 +27,11 @@
             {% else %}
                 {{ post.author.user_id }} @{{ post.created_at }}: {{ post.content }}
             {% endif %}
+            <ul>
+                {% for comment in post.comments %}
+                    {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
+                {% endfor %}
+            </ul>
         </li>
     {% endfor %}
 </ul>

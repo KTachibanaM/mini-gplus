@@ -2,6 +2,12 @@ from mongoengine import Document, ListField, BooleanField, ReferenceField, Strin
 from flask_login import UserMixin
 
 
+class CreatedAtMixin(object):
+    @property
+    def created_at(self):
+        return self.id.generation_time
+
+
 class User(Document, UserMixin):
     user_id = StringField(required=True, unique=True)
     password = StringField(required=True)
@@ -21,12 +27,12 @@ class Circle(Document):
         return filter(lambda member: member.id == user.id, self.members)
 
 
-class Comment(Document):
+class Comment(Document, CreatedAtMixin):
     content = StringField(required=True)
     author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
 
 
-class Post(Document):
+class Post(Document, CreatedAtMixin):
     author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
     content = StringField(required=True)
     is_public = BooleanField(required=True)
@@ -41,7 +47,3 @@ class Post(Document):
             return ', '.join(map(lambda circle: circle.name, self.circles))
         else:
             return '(private)'
-
-    @property
-    def created_at(self):
-        return self.id.generation_time
