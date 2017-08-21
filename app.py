@@ -7,13 +7,16 @@ from models import User, Circle, Post, Comment
 from utils import is_safe_url
 from os import urandom
 from bson.objectid import ObjectId
+import os
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = urandom(24)
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.init_app(app)
-db = MongoEngine(app)
+db = MongoEngine(app, config={
+    'host': os.environ.get('MONGODB_URI', 'localhost:27017')
+})
 app.session_interface = MongoEngineSessionInterface(db)
 
 

@@ -2,3 +2,4 @@ Flask==0.12.2
 Flask-WTF==0.14.2
 flask-mongoengine==0.9.3
 Flask-Login==0.4.0
+gunicorn==19.7.1
