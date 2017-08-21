@@ -14,8 +14,10 @@ app.secret_key = urandom(24)
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.init_app(app)
+mongodb_uri = os.environ['MONGODB_URI'] if 'MONGODB_URI' in os.environ else 'localhost:27017'
+print mongodb_uri
 db = MongoEngine(app, config={
-    'host': os.environ.get('MONGODB_URI', 'localhost:27017')
+    'host': mongodb_uri
 })
 app.session_interface = MongoEngineSessionInterface(db)
 
