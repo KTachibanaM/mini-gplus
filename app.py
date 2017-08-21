@@ -8,17 +8,20 @@ from utils import is_safe_url
 from os import urandom
 from bson.objectid import ObjectId
 import os
+from pymongo.uri_parser import parse_uri
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = urandom(24)
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.init_app(app)
-mongodb_uri = os.environ['MONGODB_URI'] if 'MONGODB_URI' in os.environ else 'localhost:27017'
-print mongodb_uri
-db = MongoEngine(app, config={
+mongodb_uri = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017/minigplus')
+mongodb_db = parse_uri(mongodb_uri)['database']
+app.config['MONGODB_SETTINGS'] = {
+    'db': mongodb_db,
     'host': mongodb_uri
-})
+}
+db = MongoEngine(app)
 app.session_interface = MongoEngineSessionInterface(db)
 
 
