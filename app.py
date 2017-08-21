@@ -27,7 +27,7 @@ def index():
     if not current_user.is_authenticated:
         signin_form = SigninForm(request.form)
         if request.method == 'POST' and signin_form.validate():
-            found_users = User.objects(user_id=signin_form.id.data, password=signin_form.password.data)
+            found_users = User.check(signin_form.id.data, signin_form.password.data)
             if not found_users:
                 signin_form.id.errors.append('Wrong id or password')
                 signin_form.password.errors.append('Wrong id or password')
@@ -95,11 +95,8 @@ def rm_comment():
 def signup():
     signup_form = SignupForm(request.form)
     if request.method == 'POST' and signup_form.validate():
-        new_user = User()
-        new_user.user_id = signup_form.id.data
-        new_user.password = signup_form.password.data
         try:
-            new_user.save()
+            User.create(signup_form.id.data, signup_form.password.data)
         except NotUniqueError:
             signup_form.id.errors.append('id {} is already taken'.format(signup_form.id.data))
         else:

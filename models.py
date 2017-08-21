@@ -1,5 +1,6 @@
 from mongoengine import Document, ListField, BooleanField, ReferenceField, StringField, PULL, CASCADE
 from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class CreatedAtMixin(object):
@@ -11,6 +12,22 @@ class CreatedAtMixin(object):
 class User(Document, UserMixin):
     user_id = StringField(required=True, unique=True)
     password = StringField(required=True)
+
+    @staticmethod
+    def create(user_id, password):
+        new_user = User()
+        new_user.user_id = user_id
+        new_user.password = generate_password_hash(password)
+        new_user.save()
+
+    @staticmethod
+    def check(user_id, password):
+        users = User.objects(user_id=user_id)
+        found_users = []
+        for user in users:
+            if check_password_hash(user.password, password):
+                found_users.append(user)
+        return found_users
 
 
 class Circle(Document):
