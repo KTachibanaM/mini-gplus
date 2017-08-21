@@ -1,0 +1,17 @@
+{% from "_header.jinja2" import header %}
+
+<html>
+<head>
+    <title>Profile | mini-gplus</title>
+</head>
+<body>
+<nav>
+    {{ header('/profile') }} | Hi {{ current_user.user_id }} <a href="/signout">Signout</a>
+</nav>
+<ul>
+    {% for post in posts %}
+        <li>@{{ post.created_at }}: {{ post.content }}</li>
+    {% endfor %}
+</ul>
+</body>
+</html>

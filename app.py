@@ -162,5 +162,11 @@ def rm_circle():
     return redirect(url_for('circles'))
 
 
+@app.route('/profile', methods=['GET'])
+@login_required
+def profile():
+    posts = reversed(sorted(Post.objects(author=current_user.id), key=lambda post: post.created_at))
+    return render_template('profile.jinja2', posts=posts)
+
 if __name__ == '__main__':
     app.run()
