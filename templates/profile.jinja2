@@ -2,11 +2,11 @@
 
 <html>
 <head>
-    <title>Profile | mini-gplus</title>
+    <title>{{ user_id }} | mini-gplus</title>
 </head>
 <body>
 <nav>
-    {{ header('/profile') }} | Hi {{ current_user.user_id }} <a href="/signout">Signout</a>
+    {% if current_user.user_id == user_id %}{{ header('/profile') }}{% else %}{{ header(None) }}{% endif %} | Hi {{ current_user.user_id }} <a href="/signout">Signout</a>
 </nav>
 <ul>
     {% for post in posts %}

@@ -22,7 +22,7 @@
                 <form method="post" action="/rmpost" style="display: inline">
                     {{ post.author.user_id }} -> {{ post.sharing_scope_str }} @{{ post.created_at }}: {{ post.content }}
                     <input type="hidden" name="id" value="{{ post.id }}" readonly>
-                    <input type="submit" value="Delete post">
+                    <input type="submit" value="Delete">
                 </form>
             {% else %}
                 {{ post.author.user_id }} @{{ post.created_at }}: {{ post.content }}

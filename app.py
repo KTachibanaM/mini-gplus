@@ -1,11 +1,12 @@
 from flask import Flask, request, render_template, redirect, url_for, abort
-from mongoengine import NotUniqueError, Q
+from mongoengine import NotUniqueError
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
 from models import User, Circle, Post, Comment
 from utils import is_safe_url
 from os import urandom
+from bson.objectid import ObjectId
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = urandom(24)
@@ -166,7 +167,15 @@ def rm_circle():
 @login_required
 def profile():
     posts = reversed(sorted(Post.objects(author=current_user.id), key=lambda post: post.created_at))
-    return render_template('profile.jinja2', posts=posts)
+    return render_template('profile.jinja2', user_id=current_user.user_id, posts=posts)
+
+
+@app.route('/profile/<public_id>', methods=['GET'])
+@login_required
+def public_profile(public_id):
+    posts = filter(lambda post: post.shared_with(current_user), Post.objects(author=ObjectId(public_id)))
+    posts = reversed(sorted(posts, key=lambda post: post.created_at))
+    return render_template('profile.jinja2', user_id=User.objects.get(id=public_id).user_id, posts=posts)
 
 if __name__ == '__main__':
     app.run()
