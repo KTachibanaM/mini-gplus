@@ -1,9 +1,9 @@
 {% extends "base/_base_user.jinja2" %}
+{% from "cards/_post.jinja2" import render_post %}
+{% from "cards/_share.jinja2" import render_share %}
 {% block title %}{{ user_id }} | mini-gplus{% endblock %}
 {% block content %}
-    <ul>
-        {% for post in posts %}
-            <li>@{{ post.created_at }}: {{ post.content }}</li>
-        {% endfor %}
-    </ul>
+    {% for post in posts %}
+        {{ render_post(post, current_user) }}
+    {% endfor %}
 {% endblock %}
