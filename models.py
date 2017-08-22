@@ -48,7 +48,7 @@ class Comment(Document, CreatedAtMixin):
     author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
     content = StringField(required=True)
 
-    def can_remove(self, current_user, post):
+    def owned_by(self, current_user, post):
         return self.author.id == current_user.id or post.can_remove(current_user)
 
 
@@ -70,7 +70,7 @@ class Post(Document, CreatedAtMixin):
                     return True
         return False
 
-    def can_remove(self, current_user):
+    def owned_by(self, current_user):
         return self.author.id == current_user.id
 
     @property

@@ -2,47 +2,64 @@
 {% from "_form.jinja2" import render_field, render_errors %}
 {% block title %}mini-gplus{% endblock %}
 {% block content %}
-    <section class="ui fluid card">
+    <div class="ui fluid card">
         <div class="content">
             <p>Share</p>
         </div>
         <div class="content">
             <form class="ui form error" method="post">
-                <section class="field">
+                <div class="field">
                     {{ render_field(form.content, this_wants_label=False, placeholder="Say something...", rows=2) }}
-                </section>
+                </div>
                 <div class="fields">
-                    <section class="four wide field">
+                    <div class="four wide field">
                         <div class="ui slider checkbox">
                             {{ render_field(form.is_public) }}
                         </div>
-                    </section>
-                    <section class="twelve wide field">
+                    </div>
+                    <div class="twelve wide field">
                         {{ render_field(form.circles, this_wants_label=False, class="ui dropdown") }}
-                    </section>
+                    </div>
                 </div>
                 {{ render_errors(form) }}
                 <button class="ui submit button">Post</button>
             </form>
         </div>
-    </section>
-    <ul>
-        {% for post in posts %}
-            <li>
-                {% if post.can_remove(current_user) %}
+    </div>
+    {% for post in posts %}
+        <div class="ui fluid card">
+            <div class="content">
+                {% if post.owned_by(current_user) %}
                     <form method="post" action="/rmpost" style="display: inline">
-                        {{ post.author.user_id }} -> {{ post.sharing_scope_str }}
-                        @{{ post.created_at }}: {{ post.content }}
                         <input type="hidden" name="id" value="{{ post.id }}" readonly>
-                        <input type="submit" value="Delete">
+                        <button class="ui right floated icon negative button">
+                            <i class="trash icon"></i>
+                        </button>
                     </form>
-                {% else %}
-                    {{ post.author.user_id }} @{{ post.created_at }}: {{ post.content }}
                 {% endif %}
+                <div class="header">
+                    {{ post.author.user_id }}
+                </div>
+                <div class="meta">
+                    {% if post.owned_by(current_user) %}
+                        @{{ post.created_at }} to {{ post.sharing_scope_str }}
+                    {% else %}
+                        @{{ post.created_at }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="content">
+                <div class="description">
+                    <p>
+                        {{ post.content }}
+                    </p>
+                </div>
+            </div>
+            <div class="content">
                 <ul>
                     {% for comment in post.comments %}
                         <li>
-                            {% if comment.can_remove(current_user, post) %}
+                            {% if comment.owned_by(current_user, post) %}
                                 <form method="post" action="/rmcomment" style="display: inline">
                                     {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
                                     <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
@@ -62,7 +79,7 @@
                         </form>
                     </li>
                 </ul>
-            </li>
-        {% endfor %}
-    </ul>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}

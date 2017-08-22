@@ -3,12 +3,12 @@
 {% block title %}Sign in | mini-gplus{% endblock %}
 {% block content %}
     <form class="ui form error" method='post'>
-        <section class="field">
+        <div class="field">
             {{ render_field(form.id) }}
-        </section>
-        <section class="field">
+        </div>
+        <div class="field">
             {{ render_field(form.password) }}
-        </section>
+        </div>
         {{ render_errors(form) }}
         <button class="ui submit button">Sign in</button>
     </form>
