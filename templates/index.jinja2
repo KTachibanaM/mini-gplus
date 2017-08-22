@@ -37,9 +37,9 @@
                         </button>
                     </form>
                 {% endif %}
-                <div class="header">
+                <p>
                     {{ post.author.user_id }}
-                </div>
+                </p>
                 <div class="meta">
                     {% if post.owned_by(current_user) %}
                         {{ post.created_at }} to {{ post.sharing_scope_str }}
