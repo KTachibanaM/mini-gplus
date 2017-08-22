@@ -49,7 +49,7 @@ class Comment(Document, CreatedAtMixin):
     content = StringField(required=True)
 
     def owned_by(self, current_user, post):
-        return self.author.id == current_user.id or post.can_remove(current_user)
+        return self.author.id == current_user.id or post.owned_by(current_user)
 
 
 class Post(Document, CreatedAtMixin):

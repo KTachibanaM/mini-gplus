@@ -30,7 +30,7 @@
         <div class="ui fluid card">
             <div class="content">
                 {% if post.owned_by(current_user) %}
-                    <form method="post" action="/rmpost" style="display: inline">
+                    <form method="post" action="/rmpost">
                         <input type="hidden" name="id" value="{{ post.id }}" readonly>
                         <button class="ui right floated icon negative button">
                             <i class="trash icon"></i>
@@ -42,9 +42,9 @@
                 </div>
                 <div class="meta">
                     {% if post.owned_by(current_user) %}
-                        @{{ post.created_at }} to {{ post.sharing_scope_str }}
+                        {{ post.created_at }} to {{ post.sharing_scope_str }}
                     {% else %}
-                        @{{ post.created_at }}
+                        {{ post.created_at }}
                     {% endif %}
                 </div>
             </div>
@@ -56,29 +56,42 @@
                 </div>
             </div>
             <div class="content">
-                <ul>
+                <div class="ui comments">
                     {% for comment in post.comments %}
-                        <li>
-                            {% if comment.owned_by(current_user, post) %}
-                                <form method="post" action="/rmcomment" style="display: inline">
-                                    {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
-                                    <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
-                                    <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
-                                    <input type="submit" value="Delete">
-                                </form>
-                            {% else %}
-                                {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
-                            {% endif %}
-                        </li>
+                        <div class="ui comment">
+                            <div class="content">
+                                <a class="author">{{ comment.author.user_id }}</a>
+                                <div class="metadata">
+                                    <span class="date">{{ comment.created_at }}</span>
+                                </div>
+                                {% if comment.owned_by(current_user, post) %}
+                                    <form method="post" action="/rmcomment" style="display: inline">
+                                        <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
+                                        <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
+                                        <button class="mini ui submit button">delete</button>
+                                    </form>
+                                {% endif %}
+                                <div class="text">
+                                    {{ comment.content }}
+                                </div>
+                            </div>
+                        </div>
                     {% endfor %}
-                    <li>
-                        <form method="post" action="/addcomment">
-                            <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
-                            <input name="content">
-                            <input type="submit" value="Comment">
-                        </form>
-                    </li>
-                </ul>
+
+                </div>
+            </div>
+            <div class="extra content">
+                <form class="ui form" method="post" action="/addcomment">
+                    <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
+                    <div class="fields">
+                        <div class="twelve wide field">
+                            <input name="content"/>
+                        </div>
+                        <div class="four wide field">
+                            <button class="ui submit button">Comment</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     {% endfor %}

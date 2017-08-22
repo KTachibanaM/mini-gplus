@@ -93,7 +93,7 @@ def add_comment():
 def rm_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
-    if comment.can_remove(current_user, post):
+    if comment.owned_by(current_user, post):
         post.comments.remove(comment)
         comment.delete()
     return redirect(url_for('index'))
