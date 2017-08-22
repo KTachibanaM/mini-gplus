@@ -2,16 +2,17 @@
 <html>
 <head>
     <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='semantic.min.css') }}">
+    <script src="{{ url_for('static', filename='jquery-3.2.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='semantic.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-<header>
+<header class="ui fixed menu">
     {% block header %}{% endblock %}
 </header>
-<article>
+<article class="ui main container">
     {% block content %}{% endblock %}
 </article>
-<footer>
-    mini-gplus v1.0
-</footer>
 </body>
 </html>

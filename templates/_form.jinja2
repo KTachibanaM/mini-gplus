@@ -1,11 +1,13 @@
 {% macro field(field) %}
-    {{ field.label }}<br>
-    {{ field(**kwargs)| safe }}<br>
+    <div class="field">
+        <label>{{ field.label }}</label>
+        {{ field(**kwargs)| safe }}
+    </div>
     {% if field.errors %}
-        <ul>
-            {% for error in field.errors %}
-                <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
+        {% for error in field.errors %}
+            <div class="ui error message">
+                <p>{{ error }}</p>
+            </div>
+        {% endfor %}
     {% endif %}
 {% endmacro %}

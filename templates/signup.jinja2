@@ -2,12 +2,10 @@
 {% from "_form.jinja2" import field %}
 {% block title %}Sign up | mini-gplus{% endblock %}
 {% block content %}
-<form method='post'>
-    <form method='post'>
+<form class="ui form error" method='post'>
     {{ field(form.id) }}
     {{ field(form.password) }}
     {{ field(form.confirm_password) }}
-    <input type='submit' value='Sign up'>
-</form>
+    <button class="ui submit button">Sign up</button>
 </form>
 {% endblock %}
