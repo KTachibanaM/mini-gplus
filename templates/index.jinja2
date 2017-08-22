@@ -1,98 +1,10 @@
-{% extends "_base_user.jinja2" %}
-{% from "_form.jinja2" import render_field, render_errors %}
+{% extends "base/_base_user.jinja2" %}
+{% from "cards/_post.jinja2" import render_post %}
+{% from "cards/_share.jinja2" import render_share %}
 {% block title %}mini-gplus{% endblock %}
 {% block content %}
-    <div class="ui fluid card">
-        <div class="content">
-            <p>Share</p>
-        </div>
-        <div class="content">
-            <form class="ui form error" method="post">
-                <div class="field">
-                    {{ render_field(form.content, this_wants_label=False, placeholder="Say something...", rows=2) }}
-                </div>
-                <div class="fields">
-                    <div class="four wide field">
-                        <div class="ui slider checkbox">
-                            {{ render_field(form.is_public) }}
-                        </div>
-                    </div>
-                    <div class="twelve wide field">
-                        {{ render_field(form.circles, this_wants_label=False, class="ui dropdown") }}
-                    </div>
-                </div>
-                {{ render_errors(form) }}
-                <button class="ui submit button">Post</button>
-            </form>
-        </div>
-    </div>
+    {{ render_share(form) }}
     {% for post in posts %}
-        <div class="ui fluid card">
-            <div class="content">
-                {% if post.owned_by(current_user) %}
-                    <form method="post" action="/rmpost">
-                        <input type="hidden" name="id" value="{{ post.id }}" readonly>
-                        <button class="ui right floated icon negative button">
-                            <i class="trash icon"></i>
-                        </button>
-                    </form>
-                {% endif %}
-                <div class="header">
-                    {{ post.author.user_id }}
-                </div>
-                <div class="meta">
-                    {% if post.owned_by(current_user) %}
-                        {{ post.created_at }} to {{ post.sharing_scope_str }}
-                    {% else %}
-                        {{ post.created_at }}
-                    {% endif %}
-                </div>
-            </div>
-            <div class="content">
-                <div class="description">
-                    <p>
-                        {{ post.content }}
-                    </p>
-                </div>
-            </div>
-            <div class="content">
-                <div class="ui comments">
-                    {% for comment in post.comments %}
-                        <div class="ui comment">
-                            <div class="content">
-                                <a class="author">{{ comment.author.user_id }}</a>
-                                <div class="metadata">
-                                    <span class="date">{{ comment.created_at }}</span>
-                                </div>
-                                {% if comment.owned_by(current_user, post) %}
-                                    <form method="post" action="/rmcomment" style="display: inline">
-                                        <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
-                                        <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
-                                        <button class="mini ui submit button">delete</button>
-                                    </form>
-                                {% endif %}
-                                <div class="text">
-                                    {{ comment.content }}
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-
-                </div>
-            </div>
-            <div class="extra content">
-                <form class="ui form" method="post" action="/addcomment">
-                    <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
-                    <div class="fields">
-                        <div class="twelve wide field">
-                            <input name="content"/>
-                        </div>
-                        <div class="four wide field">
-                            <button class="ui submit button">Comment</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+        {{ render_post(post, current_user) }}
     {% endfor %}
 {% endblock %}
