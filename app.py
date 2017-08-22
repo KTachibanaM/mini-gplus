@@ -10,7 +10,7 @@ from bson.objectid import ObjectId
 import os
 from pymongo.uri_parser import parse_uri
 
-app = Flask(__name__, template_folder='templates')
+app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = urandom(24)
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'

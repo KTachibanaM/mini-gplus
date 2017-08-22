@@ -1,5 +1,5 @@
-from wtforms import Form, StringField, BooleanField, PasswordField, validators
-from utils import DataRequiredIf, MultiCheckboxField
+from wtforms import Form, StringField, BooleanField, PasswordField, TextAreaField, validators, SelectMultipleField
+from utils import DataRequiredIf
 from bson.objectid import ObjectId
 
 
@@ -12,7 +12,7 @@ class SignupForm(Form):
         validators.DataRequired(),
         validators.EqualTo('confirm_password', message='Passwords must match')
     ])
-    confirm_password = PasswordField('Repeat Password')
+    confirm_password = PasswordField('Confirm Password')
 
 
 class SigninForm(Form):
@@ -25,16 +25,16 @@ class SigninForm(Form):
 
 
 class CreateNewCircleForm(Form):
-    name = StringField('New circle name', [
+    name = StringField('Name', [
         validators.DataRequired()
     ])
 
 
 class CreateNewPostForm(Form):
-    content = StringField('New post', [
+    content = TextAreaField('Content', [
         validators.DataRequired()
     ])
-    is_public = BooleanField('Public')
-    circles = MultiCheckboxField('Circles', [
+    is_public = BooleanField('Is public')
+    circles = SelectMultipleField('Circles', [
         DataRequiredIf(is_public=False)
     ], ObjectId)

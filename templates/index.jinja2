@@ -1,12 +1,23 @@
 {% extends "_base_user.jinja2" %}
-{% from "_form.jinja2" import field %}
+{% from "_form.jinja2" import field, errors %}
 {% block title %}mini-gplus{% endblock %}
 {% block content %}
-    <form method="post">
-        {{ field(form.content) }}
-        {{ field(form.is_public) }}
-        {{ field(form.circles) }}
-        <input type='submit' value='Create new post'>
+    <form class="ui form error" method="post">
+        <div class="field">
+            {{ field(form.content, this_wants_label=False, rows=2) }}
+        </div>
+        <div class="fields">
+            <div class="four wide field">
+                <div class="ui slider checkbox">
+                    {{ field(form.is_public) }}
+                </div>
+            </div>
+            <div class="twelve wide field">
+                {{ field(form.circles, this_wants_label=False, class="ui dropdown") }}
+            </div>
+        </div>
+        {{ errors(form) }}
+        <button class="ui submit button">Post</button>
     </form>
     <ul>
         {% for post in posts %}

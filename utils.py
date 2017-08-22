@@ -1,6 +1,5 @@
 from urlparse import urlparse, urljoin
 from flask import request
-from wtforms import SelectMultipleField, widgets
 from wtforms.validators import Optional, DataRequired
 
 
@@ -32,8 +31,3 @@ class DataRequiredIf(object):
                 if condition_field.data == data and not field.data:
                     DataRequired()(form, field)
         Optional()(form, field)
-
-
-class MultiCheckboxField(SelectMultipleField):
-    widget = widgets.ListWidget(prefix_label=False)
-    option_widget = widgets.CheckboxInput()

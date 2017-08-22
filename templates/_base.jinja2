@@ -2,9 +2,12 @@
 <html>
 <head>
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='semantic.min.css') }}">
-    <script src="{{ url_for('static', filename='jquery-3.2.1.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='semantic.min.js') }}"></script>
+    <!-- jQuery -->
+    <script src="{{ url_for('static', filename='vendor/jquery-3.2.1.min.js') }}"></script>
+    <!-- Semantic UI -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/semantic.min.css') }}">
+    <script src="{{ url_for('static', filename='vendor/semantic.min.js') }}"></script>
+    <!-- Custom style -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -14,5 +17,7 @@
 <article class="ui main container">
     {% block content %}{% endblock %}
 </article>
+<!-- Custom JS -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

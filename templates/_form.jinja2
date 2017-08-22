@@ -10,7 +10,9 @@
     {% endif %}
 {% endmacro %}
 
-{% macro field(field) %}
-    <label>{{ field.label }}</label>
+{% macro field(field, this_wants_label=True) %}
+    {% if this_wants_label %}
+        {{ field.label }}
+    {% endif %}
     {{ field(**kwargs)| safe }}
 {% endmacro %}
