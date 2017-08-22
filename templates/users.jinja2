@@ -1,18 +1,18 @@
 {% extends "_base_user.jinja2" %}
 {% block title %}Users | mini-gplus{% endblock %}
 {% block content %}
-<ul>
-    {% for user in users %}
-        <li><a href="/profile/{{ user.id }}">{{ user.user_id }}</a> |
-            {% for circle in circles %}
-                <form method="post" action="/togglemember" style="display: inline">
-                    {{ circle.name }}
-                    <input type="hidden" name="user_id" value="{{ user.id }}">
-                    <input type="hidden" name="circle_id" value="{{ circle.id }}">
-                    <input type="submit" value="{{ '-' if circle.is_member(user) else '+' }}">
-                </form> |
-            {% endfor %}
-        </li>
-    {% endfor %}
-</ul>
+    <ul>
+        {% for user in users %}
+            <li><a href="/profile/{{ user.id }}">{{ user.user_id }}</a> |
+                {% for circle in circles %}
+                    <form method="post" action="/togglemember" style="display: inline">
+                        {{ circle.name }}
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <input type="hidden" name="circle_id" value="{{ circle.id }}">
+                        <input type="submit" value="{{ '-' if circle.is_member(user) else '+' }}">
+                    </form> |
+                {% endfor %}
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}

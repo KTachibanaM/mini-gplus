@@ -1,49 +1,68 @@
 {% extends "_base_user.jinja2" %}
-{% from "_form.jinja2" import field %}
+{% from "_form.jinja2" import render_field, render_errors %}
 {% block title %}mini-gplus{% endblock %}
 {% block content %}
-<form method="post">
-    {{ field(form.content) }}
-    {{ field(form.is_public) }}
-    {{ field(form.circles) }}
-    <input type='submit' value='Create new post'>
-</form>
-<ul>
-    {% for post in posts %}
-        <li>
-            {% if post.can_remove(current_user) %}
-                <form method="post" action="/rmpost" style="display: inline">
-                    {{ post.author.user_id }} -> {{ post.sharing_scope_str }} @{{ post.created_at }}: {{ post.content }}
-                    <input type="hidden" name="id" value="{{ post.id }}" readonly>
-                    <input type="submit" value="Delete">
-                </form>
-            {% else %}
-                {{ post.author.user_id }} @{{ post.created_at }}: {{ post.content }}
-            {% endif %}
-            <ul>
-                {% for comment in post.comments %}
-                    <li>
-                        {% if comment.can_remove(current_user, post) %}
-                            <form method="post" action="/rmcomment" style="display: inline">
-                                {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
-                                <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
-                                <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
-                                <input type="submit" value="Delete">
-                            </form>
-                        {% else %}
-                            {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
-                        {% endif %}
-                    </li>
-                {% endfor %}
-                <li>
-                    <form method="post" action="/addcomment">
-                        <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
-                        <input name="content">
-                        <input type="submit" value="Comment">
+    <section class="ui fluid card">
+        <div class="content">
+            <p>Share</p>
+        </div>
+        <div class="content">
+            <form class="ui form error" method="post">
+                <section class="field">
+                    {{ render_field(form.content, this_wants_label=False, placeholder="Say something...", rows=2) }}
+                </section>
+                <div class="fields">
+                    <section class="four wide field">
+                        <div class="ui slider checkbox">
+                            {{ render_field(form.is_public) }}
+                        </div>
+                    </section>
+                    <section class="twelve wide field">
+                        {{ render_field(form.circles, this_wants_label=False, class="ui dropdown") }}
+                    </section>
+                </div>
+                {{ render_errors(form) }}
+                <button class="ui submit button">Post</button>
+            </form>
+        </div>
+    </section>
+    <ul>
+        {% for post in posts %}
+            <li>
+                {% if post.can_remove(current_user) %}
+                    <form method="post" action="/rmpost" style="display: inline">
+                        {{ post.author.user_id }} -> {{ post.sharing_scope_str }}
+                        @{{ post.created_at }}: {{ post.content }}
+                        <input type="hidden" name="id" value="{{ post.id }}" readonly>
+                        <input type="submit" value="Delete">
                     </form>
-                </li>
-            </ul>
-        </li>
-    {% endfor %}
-</ul>
+                {% else %}
+                    {{ post.author.user_id }} @{{ post.created_at }}: {{ post.content }}
+                {% endif %}
+                <ul>
+                    {% for comment in post.comments %}
+                        <li>
+                            {% if comment.can_remove(current_user, post) %}
+                                <form method="post" action="/rmcomment" style="display: inline">
+                                    {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
+                                    <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
+                                    <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
+                                    <input type="submit" value="Delete">
+                                </form>
+                            {% else %}
+                                {{ comment.author.user_id }} @{{ comment.created_at }}: {{ comment.content }}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                    <li>
+                        <form method="post" action="/addcomment">
+                            <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
+                            <input name="content">
+                            <input type="submit" value="Comment">
+                        </form>
+                    </li>
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}

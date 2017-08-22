@@ -1,9 +1,9 @@
 {% extends "_base_user.jinja2" %}
 {% block title %}{{ user_id }} | mini-gplus{% endblock %}
 {% block content %}
-<ul>
-    {% for post in posts %}
-        <li>@{{ post.created_at }}: {{ post.content }}</li>
-    {% endfor %}
-</ul>
+    <ul>
+        {% for post in posts %}
+            <li>@{{ post.created_at }}: {{ post.content }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}
