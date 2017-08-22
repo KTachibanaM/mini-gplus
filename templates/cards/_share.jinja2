@@ -16,12 +16,14 @@
                             {{ render_field(share_form.is_public) }}
                         </div>
                     </div>
-                    <div class="twelve wide field">
+                    <div class="eight wide field">
                         {{ render_field(share_form.circles, this_wants_label=False, class="ui dropdown") }}
+                    </div>
+                    <div class="four wide field">
+                        <button class="ui fluid button">Post</button>
                     </div>
                 </div>
                 {{ render_errors(share_form) }}
-                <button class="ui submit button">Post</button>
             </form>
         </div>
     </div>

@@ -1,11 +1,25 @@
 {% extends "base/_base_user.jinja2" %}
-{% from "_form.jinja2" import render_field %}
+{% from "_form.jinja2" import render_field, render_errors %}
 {% block title %}Circles | mini-gplus{% endblock %}
 {% block content %}
-    <form method='post'>
-        {{ render_field(form.name) }}
-        <input type='submit' value='Create new circle'>
-    </form>
+    <div class="ui fluid card">
+        <div class="content">
+            <p>Create new circle</p>
+        </div>
+        <div class="content">
+            <form class="ui error form" method='post'>
+                <div class="fields">
+                    <div class="twelve wide field">
+                        {{ render_field(form.name, this_wants_label=False) }}
+                    </div>
+                    <div class="four wide field">
+                        <button class="ui fluid button">Create</button>
+                    </div>
+                </div>
+                {{ render_errors(form) }}
+            </form>
+        </div>
+    </div>
     <ul>
         {% for circle in circles %}
             <li>
