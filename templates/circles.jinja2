@@ -1,9 +1,9 @@
 {% extends "_base_user.jinja2" %}
-{% from "_form.jinja2" import field %}
+{% from "_form.jinja2" import render_field %}
 {% block title %}Circles | mini-gplus{% endblock %}
 {% block content %}
     <form method='post'>
-        {{ field(form.name) }}
+        {{ render_field(form.name) }}
         <input type='submit' value='Create new circle'>
     </form>
     <ul>

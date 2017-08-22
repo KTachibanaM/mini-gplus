@@ -1,4 +1,4 @@
-{% macro errors(form) %}
+{% macro render_errors(form) %}
     {% if form.errors %}
         <section class="ui error message">
             {% for field, errors in form.errors.items() %}
@@ -10,7 +10,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro field(field, this_wants_label=True) %}
+{% macro render_field(field, this_wants_label=True) %}
     {% if this_wants_label %}
         {{ field.label }}
     {% endif %}

@@ -1,24 +1,31 @@
 {% extends "_base_user.jinja2" %}
-{% from "_form.jinja2" import field, errors %}
+{% from "_form.jinja2" import render_field, render_errors %}
 {% block title %}mini-gplus{% endblock %}
 {% block content %}
-    <form class="ui form error" method="post">
-        <section class="field">
-            {{ field(form.content, this_wants_label=False, rows=2) }}
-        </section>
-        <div class="fields">
-            <section class="four wide field">
-                <div class="ui slider checkbox">
-                    {{ field(form.is_public) }}
-                </div>
-            </section>
-            <section class="twelve wide field">
-                {{ field(form.circles, this_wants_label=False, class="ui dropdown") }}
-            </section>
+    <section class="ui fluid card">
+        <div class="content">
+            <p>Share</p>
         </div>
-        {{ errors(form) }}
-        <button class="ui submit button">Post</button>
-    </form>
+        <div class="content">
+            <form class="ui form error" method="post">
+                <section class="field">
+                    {{ render_field(form.content, this_wants_label=False, placeholder="Say something...", rows=2) }}
+                </section>
+                <div class="fields">
+                    <section class="four wide field">
+                        <div class="ui slider checkbox">
+                            {{ render_field(form.is_public) }}
+                        </div>
+                    </section>
+                    <section class="twelve wide field">
+                        {{ render_field(form.circles, this_wants_label=False, class="ui dropdown") }}
+                    </section>
+                </div>
+                {{ render_errors(form) }}
+                <button class="ui submit button">Post</button>
+            </form>
+        </div>
+    </section>
     <ul>
         {% for post in posts %}
             <li>

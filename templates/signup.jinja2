@@ -1,18 +1,18 @@
 {% extends "_base_guest.jinja2" %}
-{% from "_form.jinja2" import field, errors %}
+{% from "_form.jinja2" import render_field, render_errors %}
 {% block title %}Sign up | mini-gplus{% endblock %}
 {% block content %}
     <form class="ui form error" method='post'>
         <section class="field">
-            {{ field(form.id) }}
+            {{ render_field(form.id) }}
         </section>
         <section class="field">
-            {{ field(form.password) }}
+            {{ render_field(form.password) }}
         </section>
         <section class="field">
-            {{ field(form.confirm_password) }}
+            {{ render_field(form.confirm_password) }}
         </section>
-        {{ errors(form) }}
+        {{ render_errors(form) }}
         <button class="ui submit button">Sign up</button>
     </form>
 {% endblock %}
