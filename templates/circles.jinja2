@@ -1,25 +1,49 @@
 {% extends "base/_base_user.jinja2" %}
-{% from "_form.jinja2" import render_field %}
+{% from "_form.jinja2" import render_field, render_errors %}
 {% block title %}Circles | mini-gplus{% endblock %}
 {% block content %}
-    <form method='post'>
-        {{ render_field(form.name) }}
-        <input type='submit' value='Create new circle'>
-    </form>
-    <ul>
-        {% for circle in circles %}
-            <li>
-                <form method="post" action="/rmcircle" style="display: inline">
-                    {{ circle.name }}
-                    <input type="hidden" name="id" value="{{ circle.id }}" readonly>
-                    <input type="submit" value="Remove circle">
-                    <ul>
-                        {% for member in circle.members %}
-                            <li><a href="/profile/{{ member.id }}">{{ member.user_id }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="ui fluid card">
+        <div class="content">
+            <p>Create new circle</p>
+        </div>
+        <div class="content">
+            <form class="ui error form" method='post'>
+                <div class="fields">
+                    <div class="twelve wide field">
+                        {{ render_field(form.name, this_wants_label=False) }}
+                    </div>
+                    <div class="four wide field">
+                        <button class="ui fluid button">Create</button>
+                    </div>
+                </div>
+                {{ render_errors(form) }}
+            </form>
+        </div>
+    </div>
+    <div class="ui fluid card">
+        <div class="content">
+            <p>Manage circles</p>
+        </div>
+        <div class="content">
+            <div class="ui list">
+                {% for circle in circles %}
+                    <div class="item">
+                        <form class="ui form" method="post" action="/rmcircle" style="display: inline">
+                            {{ circle.name }}
+                            <input type="hidden" name="id" value="{{ circle.id }}" readonly>
+                            <button class="mini ui button">delete</button>
+                            <div class="ui list">
+                                {% for member in circle.members %}
+                                    <a class="item" href="/profile/{{ member.id }}">{{ member.user_id }}</a>
+                                {% endfor %}
+                            </div>
+                        </form>
+                    </div>
+                    {% if not loop.last %}
+                        <div class="ui divider"></div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 {% endblock %}
