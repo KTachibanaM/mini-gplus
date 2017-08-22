@@ -1,14 +1,7 @@
-{% from "_header.jinja2" import header %}
+{% extends "_base_user.jinja2" %}
 {% from "_form.jinja2" import field %}
-
-<html>
-<head>
-    <title>Circles | mini-gplus</title>
-</head>
-<body>
-<nav>
-    {{ header('/circles') }} | Hi {{ current_user.user_id }} <a href="/signout">Signout</a>
-</nav>
+{% block title %}Circles | mini-gplus{% endblock %}
+{% block content %}
 <form method='post'>
     {{ field(form.name) }}
     <input type='submit' value='Create new circle'>
@@ -29,5 +22,4 @@
         </li>
     {% endfor %}
 </ul>
-</body>
-</html>
+{% endblock %}

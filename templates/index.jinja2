@@ -1,14 +1,7 @@
-{% from "_header.jinja2" import header %}
+{% extends "_base_user.jinja2" %}
 {% from "_form.jinja2" import field %}
-
-<html>
-<head>
-    <title>mini-gplus</title>
-</head>
-<body>
-<nav>
-    {{ header('/') }} | Hi {{ current_user.user_id }} <a href="/signout">Signout</a>
-</nav>
+{% block title %}mini-gplus{% endblock %}
+{% block content %}
 <form method="post">
     {{ field(form.content) }}
     {{ field(form.is_public) }}
@@ -53,5 +46,4 @@
         </li>
     {% endfor %}
 </ul>
-</body>
-</html>
+{% endblock %}

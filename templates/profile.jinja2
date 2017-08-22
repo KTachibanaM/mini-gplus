@@ -1,17 +1,9 @@
-{% from "_header.jinja2" import header %}
-
-<html>
-<head>
-    <title>{{ user_id }} | mini-gplus</title>
-</head>
-<body>
-<nav>
-    {% if current_user.user_id == user_id %}{{ header('/profile') }}{% else %}{{ header(None) }}{% endif %} | Hi {{ current_user.user_id }} <a href="/signout">Signout</a>
-</nav>
+{% extends "_base_user.jinja2" %}
+{% block title %}{{ user_id }} | mini-gplus{% endblock %}
+{% block content %}
 <ul>
     {% for post in posts %}
         <li>@{{ post.created_at }}: {{ post.content }}</li>
     {% endfor %}
 </ul>
-</body>
-</html>
+{% endblock %}
