@@ -4,7 +4,7 @@ from bson.objectid import ObjectId
 
 
 class SignupForm(Form):
-    id = StringField('id', [
+    id = StringField('ID', [
         validators.DataRequired(),
         validators.Length(min=2, max=256)
     ])
@@ -16,7 +16,7 @@ class SignupForm(Form):
 
 
 class SigninForm(Form):
-    id = StringField('id', [
+    id = StringField('ID', [
         validators.DataRequired()
     ])
     password = PasswordField('Password', [

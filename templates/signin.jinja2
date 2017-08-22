@@ -1,10 +1,15 @@
 {% extends "_base_guest.jinja2" %}
-{% from "_form.jinja2" import field %}
+{% from "_form.jinja2" import field, errors %}
 {% block title %}Sign in | mini-gplus{% endblock %}
 {% block content %}
-<form class="ui form error" method='post'>
-    {{ field(form.id) }}
-    {{ field(form.password) }}
-    <button class="ui submit button">Sign in</button>
-</form>
+    <form class="ui form error" method='post'>
+        <div class="field">
+            {{ field(form.id) }}
+        </div>
+        <div class="field">
+            {{ field(form.password) }}
+        </div>
+        {{ errors(form) }}
+        <button class="ui submit button">Sign in</button>
+    </form>
 {% endblock %}
