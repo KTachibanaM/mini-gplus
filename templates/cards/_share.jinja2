@@ -1,0 +1,28 @@
+{% from "_form.jinja2" import render_field, render_errors %}
+
+{% macro render_share(share_form) %}
+    <div class="ui fluid card">
+        <div class="content">
+            <p>Share</p>
+        </div>
+        <div class="content">
+            <form class="ui form error" method="post">
+                <div class="field">
+                    {{ render_field(share_form.content, this_wants_label=False, placeholder="Say something...", rows=2) }}
+                </div>
+                <div class="fields">
+                    <div class="four wide field">
+                        <div class="ui slider checkbox">
+                            {{ render_field(share_form.is_public) }}
+                        </div>
+                    </div>
+                    <div class="twelve wide field">
+                        {{ render_field(share_form.circles, this_wants_label=False, class="ui dropdown") }}
+                    </div>
+                </div>
+                {{ render_errors(share_form) }}
+                <button class="ui submit button">Post</button>
+            </form>
+        </div>
+    </div>
+{% endmacro %}
