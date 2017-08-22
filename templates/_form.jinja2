@@ -1,12 +1,12 @@
 {% macro render_errors(form) %}
     {% if form.errors %}
-        <section class="ui error message">
+        <div class="ui error message">
             {% for field, errors in form.errors.items() %}
                 {% for error in errors %}
                     <p>{{ field }}: {{ error }}</p>
                 {% endfor %}
             {% endfor %}
-        </section>
+        </div>
     {% endif %}
 {% endmacro %}
 
