@@ -21,31 +21,25 @@
         </div>
     </div>
     {% if circles %}
-        <div class="ui fluid raised card">
-            <div class="content">
-                <p>Manage circles</p>
-            </div>
-            <div class="content">
-                <div class="ui list">
-                    {% for circle in circles %}
-                        <div class="item">
-                            <form class="ui form" method="post" action="/rmcircle" style="display: inline">
-                                {{ circle.name }}
-                                <input type="hidden" name="id" value="{{ circle.id }}" readonly>
-                                <button class="mini ui button">delete</button>
-                                <div class="ui list">
-                                    {% for member in circle.members %}
-                                        <a class="item" href="/profile/{{ member.id }}">{{ member.user_id }}</a>
-                                    {% endfor %}
-                                </div>
-                            </form>
+        {% for circle in circles %}
+            <form class="ui form" method="post" action="/rmcircle" style="display: inline">
+                <input type="hidden" name="id" value="{{ circle.id }}" readonly>
+                <div class="ui raised fluid card">
+                    <div class="content">
+                        <button class="ui right floated icon negative button">
+                            <i class="trash icon"></i>
+                        </button>
+                        <p>{{ circle.name }}</p>
+                    </div>
+                    <div class="content">
+                        <div class="ui list">
+                            {% for member in circle.members %}
+                                <a class="item" href="/profile/{{ member.id }}">{{ member.user_id }}</a>
+                            {% endfor %}
                         </div>
-                        {% if not loop.last %}
-                            <div class="ui divider"></div>
-                        {% endif %}
-                    {% endfor %}
+                    </div>
                 </div>
-            </div>
-        </div>
+            </form>
+        {% endfor %}
     {% endif %}
 {% endblock %}
