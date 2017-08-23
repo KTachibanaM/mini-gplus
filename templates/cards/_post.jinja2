@@ -9,9 +9,9 @@
                     </button>
                 </form>
             {% endif %}
-            <p>
+            <a class="author" href="/profile/{{ post.author.id }}">
                 {{ post.author.user_id }}
-            </p>
+            </a>
             <div class="meta">
                 {% if post.owned_by(current_user) %}
                     {{ post.created_at }} to {{ post.sharing_scope_str }}
@@ -33,7 +33,9 @@
                     {% for comment in post.comments %}
                         <div class="ui comment">
                             <div class="content">
-                                <a class="author">{{ comment.author.user_id }}</a>
+                                <a class="author" href="/profile/{{ comment.author.id }}">
+                                    {{ comment.author.user_id }}
+                                </a>
                                 <div class="metadata">
                                     <span class="date">{{ comment.created_at }}</span>
                                 </div>
@@ -50,7 +52,6 @@
                             </div>
                         </div>
                     {% endfor %}
-
                 </div>
             </div>
         {% endif %}

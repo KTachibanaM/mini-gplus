@@ -32,7 +32,7 @@
                         <p>{{ circle.name }}</p>
                     </div>
                     <div class="content">
-                        <div class="ui list">
+                        <div class="ui relaxed list">
                             {% for member in circle.members %}
                                 <a class="item" href="/profile/{{ member.id }}">{{ member.user_id }}</a>
                             {% endfor %}
