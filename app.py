@@ -65,7 +65,7 @@ def index():
         return render_template('index.jinja2', form=create_new_post_form, posts=posts)
 
 
-@app.route('/rmpost', methods=['POST'])
+@app.route('/rm-post', methods=['POST'])
 @login_required
 def rm_post():
     post = Post.objects.get(id=request.form.get('id'))
@@ -74,7 +74,7 @@ def rm_post():
     return redirect(url_for('index'))
 
 
-@app.route('/addcomment', methods=['POST'])
+@app.route('/add-comment', methods=['POST'])
 @login_required
 def add_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
@@ -88,7 +88,7 @@ def add_comment():
     return redirect(url_for('index'))
 
 
-@app.route('/rmcomment', methods=['POST'])
+@app.route('/rm-comment', methods=['POST'])
 @login_required
 def rm_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
@@ -145,7 +145,7 @@ def circles():
     return render_template('circles.jinja2', form=create_new_circle_form, circles=Circle.objects(owner=current_user.id))
 
 
-@app.route('/togglemember', methods=['POST'])
+@app.route('/toggle-member', methods=['POST'])
 @login_required
 def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
@@ -159,7 +159,7 @@ def toggle_member():
     return redirect(url_for('users'))
 
 
-@app.route('/rmcircle', methods=['POST'])
+@app.route('/rm-circle', methods=['POST'])
 @login_required
 def rm_circle():
     circle = Circle.objects.get(id=request.form.get('id'))

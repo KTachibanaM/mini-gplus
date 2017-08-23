@@ -22,7 +22,7 @@
     </div>
     {% if circles %}
         {% for circle in circles %}
-            <form class="ui form" method="post" action="/rmcircle" style="display: inline">
+            <form class="ui form" method="post" action="/rm-circle" style="display: inline">
                 <input type="hidden" name="id" value="{{ circle.id }}" readonly>
                 <div class="ui raised fluid card">
                     <div class="content">

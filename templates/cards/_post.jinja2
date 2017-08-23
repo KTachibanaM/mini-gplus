@@ -2,7 +2,7 @@
     <div class="ui fluid raised card">
         <div class="content">
             {% if post.owned_by(current_user) %}
-                <form method="post" action="/rmpost">
+                <form method="post" action="/rm-post">
                     <input type="hidden" name="id" value="{{ post.id }}" readonly>
                     <button class="ui right floated icon negative button">
                         <i class="trash icon"></i>
@@ -40,7 +40,7 @@
                                     <span class="date">{{ comment.created_at }}</span>
                                 </div>
                                 {% if comment.owned_by(current_user, post) %}
-                                    <form method="post" action="/rmcomment" style="display: inline">
+                                    <form method="post" action="/rm-comment" style="display: inline">
                                         <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
                                         <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
                                         <button class="mini ui red button">delete</button>
@@ -56,7 +56,7 @@
             </div>
         {% endif %}
         <div class="extra content">
-            <form class="ui form" method="post" action="/addcomment">
+            <form class="ui form" method="post" action="/add-comment">
                 <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
                 <div class="fields">
                     <div class="twelve wide field">
