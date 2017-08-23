@@ -3,9 +3,6 @@
 {% macro render_share(share_form) %}
     <div class="ui fluid raised card">
         <div class="content">
-            <p>Share</p>
-        </div>
-        <div class="content">
             <form class="ui form error" method="post">
                 <div class="field">
                     {{ render_field(share_form.content, this_wants_label=False, placeholder="Say something...", rows=2) }}
