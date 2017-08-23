@@ -4,7 +4,11 @@
 {% block title %}mini-gplus{% endblock %}
 {% block content %}
     {{ render_share(form) }}
-    {% for post in posts %}
-        {{ render_post(post, current_user) }}
-    {% endfor %}
+    {% if posts %}
+        {% for post in posts %}
+            {{ render_post(post, current_user) }}
+        {% endfor %}
+    {% else %}
+        <p>You have reached end of the stream</p>
+    {% endif %}
 {% endblock %}

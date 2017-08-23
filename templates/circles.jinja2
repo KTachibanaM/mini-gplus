@@ -20,30 +20,32 @@
             </form>
         </div>
     </div>
-    <div class="ui fluid raised card">
-        <div class="content">
-            <p>Manage circles</p>
-        </div>
-        <div class="content">
-            <div class="ui list">
-                {% for circle in circles %}
-                    <div class="item">
-                        <form class="ui form" method="post" action="/rmcircle" style="display: inline">
-                            {{ circle.name }}
-                            <input type="hidden" name="id" value="{{ circle.id }}" readonly>
-                            <button class="mini ui button">delete</button>
-                            <div class="ui list">
-                                {% for member in circle.members %}
-                                    <a class="item" href="/profile/{{ member.id }}">{{ member.user_id }}</a>
-                                {% endfor %}
-                            </div>
-                        </form>
-                    </div>
-                    {% if not loop.last %}
-                        <div class="ui divider"></div>
-                    {% endif %}
-                {% endfor %}
+    {% if circles %}
+        <div class="ui fluid raised card">
+            <div class="content">
+                <p>Manage circles</p>
+            </div>
+            <div class="content">
+                <div class="ui list">
+                    {% for circle in circles %}
+                        <div class="item">
+                            <form class="ui form" method="post" action="/rmcircle" style="display: inline">
+                                {{ circle.name }}
+                                <input type="hidden" name="id" value="{{ circle.id }}" readonly>
+                                <button class="mini ui button">delete</button>
+                                <div class="ui list">
+                                    {% for member in circle.members %}
+                                        <a class="item" href="/profile/{{ member.id }}">{{ member.user_id }}</a>
+                                    {% endfor %}
+                                </div>
+                            </form>
+                        </div>
+                        {% if not loop.last %}
+                            <div class="ui divider"></div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}

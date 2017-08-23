@@ -61,7 +61,7 @@ def index():
             new_post.save()
 
         posts = filter(lambda post: post.shared_with(current_user), Post.objects())
-        posts = reversed(sorted(posts, key=lambda post: post.created_at))
+        posts = list(reversed(sorted(posts, key=lambda post: post.created_at)))
         return render_template('index.jinja2', form=create_new_post_form, posts=posts)
 
 
@@ -171,7 +171,7 @@ def rm_circle():
 @app.route('/profile', methods=['GET'])
 @login_required
 def profile():
-    posts = reversed(sorted(Post.objects(author=current_user.id), key=lambda post: post.created_at))
+    posts = list(reversed(sorted(Post.objects(author=current_user.id), key=lambda post: post.created_at)))
     return render_template('profile.jinja2', user_id=current_user.user_id, posts=posts)
 
 
@@ -179,7 +179,7 @@ def profile():
 @login_required
 def public_profile(public_id):
     posts = filter(lambda post: post.shared_with(current_user), Post.objects(author=ObjectId(public_id)))
-    posts = reversed(sorted(posts, key=lambda post: post.created_at))
+    posts = list(reversed(sorted(posts, key=lambda post: post.created_at)))
     return render_template('profile.jinja2', user_id=User.objects.get(id=public_id).user_id, posts=posts)
 
 if __name__ == '__main__':
