@@ -1,5 +1,5 @@
 {% macro render_post(post, current_user) %}
-    <div class="ui fluid card">
+    <div class="ui fluid raised card">
         <div class="content">
             {% if post.owned_by(current_user) %}
                 <form method="post" action="/rmpost">
