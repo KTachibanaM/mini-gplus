@@ -1,18 +1,38 @@
 {% extends "base/_base_user.jinja2" %}
 {% block title %}Users | mini-gplus{% endblock %}
 {% block content %}
-    <ul>
+    {% if users %}
         {% for user in users %}
-            <li><a href="/profile/{{ user.id }}">{{ user.user_id }}</a> |
-                {% for circle in circles %}
-                    <form method="post" action="/togglemember" style="display: inline">
-                        {{ circle.name }}
-                        <input type="hidden" name="user_id" value="{{ user.id }}">
-                        <input type="hidden" name="circle_id" value="{{ circle.id }}">
-                        <input type="submit" value="{{ '-' if circle.is_member(user) else '+' }}">
-                    </form> |
-                {% endfor %}
-            </li>
+            <div class="ui fluid raised card">
+                <div class="content">
+                    <a href="/profile/{{ user.id }}">
+                        {{ user.user_id }}
+                    </a>
+                </div>
+                {% if circles %}
+                    <div class="content">
+                        {% for circle in circles %}
+                            <form method="post" action="/togglemember" style="display: inline">
+                                <input type="hidden" name="user_id" value="{{ user.id }}">
+                                <input type="hidden" name="circle_id" value="{{ circle.id }}">
+                                {% if circle.is_member(user) %}
+                                    <button class="ui labeled icon red button">
+                                        <i class="minus icon"></i>
+                                        {{ circle.name }}
+                                    </button>
+                                {% else %}
+                                    <button class="ui labeled icon green button">
+                                        <i class="add icon"></i>
+                                        {{ circle.name }}
+                                    </button>
+                                {% endif %}
+                            </form>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
         {% endfor %}
-    </ul>
+    {% else %}
+        <p>No other users, yet...</p>
+    {% endif %}
 {% endblock %}

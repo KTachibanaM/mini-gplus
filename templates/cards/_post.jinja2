@@ -1,5 +1,5 @@
 {% macro render_post(post, current_user) %}
-    <div class="ui fluid card">
+    <div class="ui fluid raised card">
         <div class="content">
             {% if post.owned_by(current_user) %}
                 <form method="post" action="/rmpost">
@@ -9,9 +9,9 @@
                     </button>
                 </form>
             {% endif %}
-            <p>
+            <a class="author" href="/profile/{{ post.author.id }}">
                 {{ post.author.user_id }}
-            </p>
+            </a>
             <div class="meta">
                 {% if post.owned_by(current_user) %}
                     {{ post.created_at }} to {{ post.sharing_scope_str }}
@@ -33,7 +33,9 @@
                     {% for comment in post.comments %}
                         <div class="ui comment">
                             <div class="content">
-                                <a class="author">{{ comment.author.user_id }}</a>
+                                <a class="author" href="/profile/{{ comment.author.id }}">
+                                    {{ comment.author.user_id }}
+                                </a>
                                 <div class="metadata">
                                     <span class="date">{{ comment.created_at }}</span>
                                 </div>
@@ -41,7 +43,7 @@
                                     <form method="post" action="/rmcomment" style="display: inline">
                                         <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
                                         <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
-                                        <button class="mini ui button">delete</button>
+                                        <button class="mini ui red button">delete</button>
                                     </form>
                                 {% endif %}
                                 <div class="text">
@@ -50,7 +52,6 @@
                             </div>
                         </div>
                     {% endfor %}
-
                 </div>
             </div>
         {% endif %}
@@ -62,7 +63,7 @@
                         <input name="content"/>
                     </div>
                     <div class="four wide field">
-                        <button class="ui fluid button">Comment</button>
+                        <button class="ui fluid blue button">Comment</button>
                     </div>
                 </div>
             </form>
