@@ -10,6 +10,18 @@
     {% endif %}
 {% endmacro %}
 
+{% macro render_flashed_errors() %}
+    {% with errors = get_flashed_messages(category_filter=['error']) %}
+        {% if errors %}
+            <div class="ui error message">
+                {% for error in errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+{% endmacro %}
+
 {% macro render_field(field, this_wants_label=True) %}
     {% if this_wants_label %}
         {{ field.label }}

@@ -4,7 +4,7 @@ from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
 from models import User, Circle, Post, Comment
-from utils import is_safe_url
+from utils import is_safe_url, flash_error
 from os import urandom
 from bson.objectid import ObjectId
 import os
@@ -129,20 +129,29 @@ def users():
     )
 
 
-@app.route('/circles', methods=['GET', 'POST'])
+@app.route('/circles', methods=['GET'])
 @login_required
 def circles():
-    create_new_circle_form = CreateNewCircleForm(request.form)
-    if request.method == 'POST' and create_new_circle_form.validate():
-        new_circle_name = create_new_circle_form.name.data
+    form = CreateNewCircleForm()
+    return render_template('circles.jinja2', form=form, circles=Circle.objects(owner=current_user.id))
+
+
+@app.route('/add-circle', methods=['POST'])
+def add_circle():
+    form = CreateNewCircleForm(request.form)
+    if form.validate():
+        new_circle_name = form.name.data
         try:
             new_circle = Circle()
             new_circle.owner = current_user.id
             new_circle.name = new_circle_name
             new_circle.save()
         except NotUniqueError:
-            create_new_circle_form.name.errors.append('Circle {} already exists'.format(new_circle_name))
-    return render_template('circles.jinja2', form=create_new_circle_form, circles=Circle.objects(owner=current_user.id))
+            flash_error('{} already exists'.format(new_circle_name))
+    else:
+        for error in form.all_errors_str:
+            flash_error(error)
+    return redirect(url_for('circles'))
 
 
 @app.route('/toggle-member', methods=['POST'])

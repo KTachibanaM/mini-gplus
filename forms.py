@@ -3,7 +3,15 @@ from utils import DataRequiredIf
 from bson.objectid import ObjectId
 
 
-class SignupForm(Form):
+class AllErrorsStrMixin(object):
+    @property
+    def all_errors_str(self):
+        for field, errors in self.errors.items():
+            for error in errors:
+                yield "{}: {}".format(field, error)
+
+
+class SignupForm(Form, AllErrorsStrMixin):
     id = StringField('ID', [
         validators.DataRequired(),
         validators.Length(min=2, max=256)
@@ -15,7 +23,7 @@ class SignupForm(Form):
     confirm_password = PasswordField('Confirm Password')
 
 
-class SigninForm(Form):
+class SigninForm(Form, AllErrorsStrMixin):
     id = StringField('ID', [
         validators.DataRequired()
     ])
@@ -24,13 +32,13 @@ class SigninForm(Form):
     ])
 
 
-class CreateNewCircleForm(Form):
+class CreateNewCircleForm(Form, AllErrorsStrMixin):
     name = StringField('Name', [
         validators.DataRequired()
     ])
 
 
-class CreateNewPostForm(Form):
+class CreateNewPostForm(Form, AllErrorsStrMixin):
     content = TextAreaField('Content', [
         validators.DataRequired()
     ])
