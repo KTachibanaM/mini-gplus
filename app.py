@@ -65,6 +65,26 @@ def index():
         return render_template('index.jinja2', form=create_new_post_form, posts=posts)
 
 
+@app.route('/signup', methods=['GET'])
+def signup():
+    return render_template('signup.jinja2', form=SignupForm())
+
+
+@app.route('/add-user', methods=['POST'])
+def add_user():
+    signup_form = SignupForm(request.form)
+    if signup_form.validate():
+        try:
+            User.create(signup_form.id.data, signup_form.password.data)
+        except NotUniqueError:
+            flash_error('id {} is already taken'.format(signup_form.id.data))
+        else:
+            return redirect(url_for('index'))
+    for error in signup_form.all_errors_str:
+        flash_error(error)
+    return redirect(url_for('signup'))
+
+
 @app.route('/rm-post', methods=['POST'])
 @login_required
 def rm_post():
@@ -99,26 +119,6 @@ def rm_comment():
     return redirect(url_for('index'))
 
 
-@app.route('/signup', methods=['GET'])
-def signup():
-    return render_template('signup.jinja2', form=SignupForm())
-
-
-@app.route('/add-user', methods=['POST'])
-def add_user():
-    signup_form = SignupForm(request.form)
-    if signup_form.validate():
-        try:
-            User.create(signup_form.id.data, signup_form.password.data)
-        except NotUniqueError:
-            flash_error('id {} is already taken'.format(signup_form.id.data))
-        else:
-            return redirect(url_for('index'))
-    for error in signup_form.all_errors_str:
-        flash_error(error)
-    return redirect(url_for('signup'))
-
-
 @app.route('/signout')
 @login_required
 def signout():
@@ -144,6 +144,7 @@ def circles():
 
 
 @app.route('/add-circle', methods=['POST'])
+@login_required
 def add_circle():
     form = CreateNewCircleForm(request.form)
     if form.validate():
