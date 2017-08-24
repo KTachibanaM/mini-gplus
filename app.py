@@ -49,16 +49,11 @@ def index():
                 return redirect(url_for('index'))
         return render_template('signin.jinja2', form=signin_form)
     else:
-        current_circles = Circle.objects(owner=current_user.id)
-        create_new_post_form = CreateNewPostForm(request.form)
-        create_new_post_form.circles.choices = map(lambda circle: (circle.id, circle.name), current_circles)
-        if request.method == 'POST' and create_new_post_form.validate():
-            new_post = Post()
-            new_post.author = current_user.id
-            new_post.content = create_new_post_form.content.data
-            new_post.is_public = create_new_post_form.is_public.data
-            new_post.circles = create_new_post_form.circles.data
-            new_post.save()
+        create_new_post_form = CreateNewPostForm()
+        create_new_post_form.circles.choices = map(
+            lambda circle: (circle.id, circle.name),
+            Circle.objects(owner=current_user.id)
+        )
 
         posts = filter(lambda post: post.shared_with(current_user), Post.objects())
         posts = list(reversed(sorted(posts, key=lambda post: post.created_at)))
@@ -83,6 +78,27 @@ def add_user():
     for error in signup_form.all_errors_str:
         flash_error(error)
     return redirect(url_for('signup'))
+
+
+@app.route('/add-post', methods=['POST'])
+@login_required
+def add_post():
+    create_new_post_form = CreateNewPostForm(request.form)
+    create_new_post_form.circles.choices = map(
+        lambda circle: (circle.id, circle.name),
+        Circle.objects(owner=current_user.id)
+    )
+    if create_new_post_form.validate():
+        new_post = Post()
+        new_post.author = current_user.id
+        new_post.content = create_new_post_form.content.data
+        new_post.is_public = create_new_post_form.is_public.data
+        new_post.circles = create_new_post_form.circles.data
+        new_post.save()
+    else:
+        for error in create_new_post_form.all_errors_str:
+            flash_error(error)
+    return redirect(url_for('index'))
 
 
 @app.route('/rm-post', methods=['POST'])
