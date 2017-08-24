@@ -30,34 +30,36 @@ def load_user(loaded_id):
     return User.objects.get(id=loaded_id)
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/", methods=['GET'])
 def index():
     if not current_user.is_authenticated:
-        signin_form = SigninForm(request.form)
-        if request.method == 'POST' and signin_form.validate():
-            found_users = User.check(signin_form.id.data, signin_form.password.data)
-            if not found_users:
-                signin_form.id.errors.append('Wrong id or password')
-                signin_form.password.errors.append('Wrong id or password')
-            elif len(found_users) > 1:
-                return abort(500)
-            else:
-                login_user(found_users[0], remember=True)
-                next_arg = request.args.get('next')
-                if not is_safe_url(next_arg):
-                    return abort(400)
-                return redirect(url_for('index'))
-        return render_template('signin.jinja2', form=signin_form)
+        return render_template('signin.jinja2', form=SigninForm())
     else:
         create_new_post_form = CreateNewPostForm()
         create_new_post_form.circles.choices = map(
             lambda circle: (circle.id, circle.name),
             Circle.objects(owner=current_user.id)
         )
-
         posts = filter(lambda post: post.shared_with(current_user), Post.objects())
         posts = list(reversed(sorted(posts, key=lambda post: post.created_at)))
         return render_template('index.jinja2', form=create_new_post_form, posts=posts)
+
+
+@app.route('/signin', methods=['POST'])
+def signin():
+    signin_form = SigninForm(request.form)
+    if signin_form.validate():
+        found_users = User.check(signin_form.id.data, signin_form.password.data)
+        if not found_users:
+            flash_error('Wrong id or password')
+        elif len(found_users) > 1:
+            return abort(500)
+        else:
+            login_user(found_users[0], remember=True)
+    else:
+        for error in signin_form.all_errors_str:
+            flash_error(error)
+    return redirect(url_for('index'))
 
 
 @app.route('/signup', methods=['GET'])

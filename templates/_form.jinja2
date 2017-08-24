@@ -1,15 +1,3 @@
-{% macro render_errors(form) %}
-    {% if form.errors %}
-        <div class="ui error message">
-            {% for field, errors in form.errors.items() %}
-                {% for error in errors %}
-                    <p>{{ field }}: {{ error }}</p>
-                {% endfor %}
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endmacro %}
-
 {% macro render_flashed_errors() %}
     {% with errors = get_flashed_messages(category_filter=['error']) %}
         {% if errors %}

@@ -1,15 +1,15 @@
 {% extends "base/_base_guest.jinja2" %}
-{% from "_form.jinja2" import render_field, render_errors %}
+{% from "_form.jinja2" import render_field, render_flashed_errors %}
 {% block title %}Sign in | mini-gplus{% endblock %}
 {% block content %}
-    <form class="ui form error" method='post'>
+    <form action="/signin" class="ui form error" method='post'>
         <div class="field">
             {{ render_field(form.id) }}
         </div>
         <div class="field">
             {{ render_field(form.password) }}
         </div>
-        {{ render_errors(form) }}
+        {{ render_flashed_errors() }}
         <button class="ui fluid button">Sign in</button>
     </form>
 {% endblock %}
