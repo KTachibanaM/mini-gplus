@@ -4,7 +4,7 @@ from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
 from models import User, Circle, Post, Comment
-from utils import is_safe_url
+from utils import is_safe_url, flash_error
 from os import urandom
 from bson.objectid import ObjectId
 import os
@@ -30,42 +30,80 @@ def load_user(loaded_id):
     return User.objects.get(id=loaded_id)
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/", methods=['GET'])
 def index():
     if not current_user.is_authenticated:
-        signin_form = SigninForm(request.form)
-        if request.method == 'POST' and signin_form.validate():
-            found_users = User.check(signin_form.id.data, signin_form.password.data)
-            if not found_users:
-                signin_form.id.errors.append('Wrong id or password')
-                signin_form.password.errors.append('Wrong id or password')
-            elif len(found_users) > 1:
-                return abort(500)
-            else:
-                login_user(found_users[0], remember=True)
-                next_arg = request.args.get('next')
-                if not is_safe_url(next_arg):
-                    return abort(400)
-                return redirect(url_for('index'))
-        return render_template('signin.jinja2', form=signin_form)
+        return render_template('signin.jinja2', form=SigninForm())
     else:
-        current_circles = Circle.objects(owner=current_user.id)
-        create_new_post_form = CreateNewPostForm(request.form)
-        create_new_post_form.circles.choices = map(lambda circle: (circle.id, circle.name), current_circles)
-        if request.method == 'POST' and create_new_post_form.validate():
-            new_post = Post()
-            new_post.author = current_user.id
-            new_post.content = create_new_post_form.content.data
-            new_post.is_public = create_new_post_form.is_public.data
-            new_post.circles = create_new_post_form.circles.data
-            new_post.save()
-
+        create_new_post_form = CreateNewPostForm()
+        create_new_post_form.circles.choices = map(
+            lambda circle: (circle.id, circle.name),
+            Circle.objects(owner=current_user.id)
+        )
         posts = filter(lambda post: post.shared_with(current_user), Post.objects())
         posts = list(reversed(sorted(posts, key=lambda post: post.created_at)))
         return render_template('index.jinja2', form=create_new_post_form, posts=posts)
 
 
-@app.route('/rmpost', methods=['POST'])
+@app.route('/signin', methods=['POST'])
+def signin():
+    signin_form = SigninForm(request.form)
+    if signin_form.validate():
+        found_users = User.check(signin_form.id.data, signin_form.password.data)
+        if not found_users:
+            flash_error('Wrong id or password')
+        elif len(found_users) > 1:
+            return abort(500)
+        else:
+            login_user(found_users[0], remember=True)
+    else:
+        for error in signin_form.all_errors_str:
+            flash_error(error)
+    return redirect(url_for('index'))
+
+
+@app.route('/signup', methods=['GET'])
+def signup():
+    return render_template('signup.jinja2', form=SignupForm())
+
+
+@app.route('/add-user', methods=['POST'])
+def add_user():
+    signup_form = SignupForm(request.form)
+    if signup_form.validate():
+        try:
+            User.create(signup_form.id.data, signup_form.password.data)
+        except NotUniqueError:
+            flash_error('id {} is already taken'.format(signup_form.id.data))
+        else:
+            return redirect(url_for('index'))
+    for error in signup_form.all_errors_str:
+        flash_error(error)
+    return redirect(url_for('signup'))
+
+
+@app.route('/add-post', methods=['POST'])
+@login_required
+def add_post():
+    create_new_post_form = CreateNewPostForm(request.form)
+    create_new_post_form.circles.choices = map(
+        lambda circle: (circle.id, circle.name),
+        Circle.objects(owner=current_user.id)
+    )
+    if create_new_post_form.validate():
+        new_post = Post()
+        new_post.author = current_user.id
+        new_post.content = create_new_post_form.content.data
+        new_post.is_public = create_new_post_form.is_public.data
+        new_post.circles = create_new_post_form.circles.data
+        new_post.save()
+    else:
+        for error in create_new_post_form.all_errors_str:
+            flash_error(error)
+    return redirect(url_for('index'))
+
+
+@app.route('/rm-post', methods=['POST'])
 @login_required
 def rm_post():
     post = Post.objects.get(id=request.form.get('id'))
@@ -74,7 +112,7 @@ def rm_post():
     return redirect(url_for('index'))
 
 
-@app.route('/addcomment', methods=['POST'])
+@app.route('/add-comment', methods=['POST'])
 @login_required
 def add_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
@@ -88,7 +126,7 @@ def add_comment():
     return redirect(url_for('index'))
 
 
-@app.route('/rmcomment', methods=['POST'])
+@app.route('/rm-comment', methods=['POST'])
 @login_required
 def rm_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
@@ -97,19 +135,6 @@ def rm_comment():
         post.comments.remove(comment)
         comment.delete()
     return redirect(url_for('index'))
-
-
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    signup_form = SignupForm(request.form)
-    if request.method == 'POST' and signup_form.validate():
-        try:
-            User.create(signup_form.id.data, signup_form.password.data)
-        except NotUniqueError:
-            signup_form.id.errors.append('id {} is already taken'.format(signup_form.id.data))
-        else:
-            return redirect(url_for('index'))
-    return render_template('signup.jinja2', form=signup_form)
 
 
 @app.route('/signout')
@@ -129,23 +154,33 @@ def users():
     )
 
 
-@app.route('/circles', methods=['GET', 'POST'])
+@app.route('/circles', methods=['GET'])
 @login_required
 def circles():
-    create_new_circle_form = CreateNewCircleForm(request.form)
-    if request.method == 'POST' and create_new_circle_form.validate():
-        new_circle_name = create_new_circle_form.name.data
+    form = CreateNewCircleForm()
+    return render_template('circles.jinja2', form=form, circles=Circle.objects(owner=current_user.id))
+
+
+@app.route('/add-circle', methods=['POST'])
+@login_required
+def add_circle():
+    form = CreateNewCircleForm(request.form)
+    if form.validate():
+        new_circle_name = form.name.data
         try:
             new_circle = Circle()
             new_circle.owner = current_user.id
             new_circle.name = new_circle_name
             new_circle.save()
         except NotUniqueError:
-            create_new_circle_form.name.errors.append('Circle {} already exists'.format(new_circle_name))
-    return render_template('circles.jinja2', form=create_new_circle_form, circles=Circle.objects(owner=current_user.id))
+            flash_error('{} already exists'.format(new_circle_name))
+    else:
+        for error in form.all_errors_str:
+            flash_error(error)
+    return redirect(url_for('circles'))
 
 
-@app.route('/togglemember', methods=['POST'])
+@app.route('/toggle-member', methods=['POST'])
 @login_required
 def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
@@ -159,7 +194,7 @@ def toggle_member():
     return redirect(url_for('users'))
 
 
-@app.route('/rmcircle', methods=['POST'])
+@app.route('/rm-circle', methods=['POST'])
 @login_required
 def rm_circle():
     circle = Circle.objects.get(id=request.form.get('id'))

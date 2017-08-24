@@ -1,13 +1,13 @@
-{% macro render_errors(form) %}
-    {% if form.errors %}
-        <div class="ui error message">
-            {% for field, errors in form.errors.items() %}
+{% macro render_flashed_errors() %}
+    {% with errors = get_flashed_messages(category_filter=['error']) %}
+        {% if errors %}
+            <div class="ui error message">
                 {% for error in errors %}
-                    <p>{{ field }}: {{ error }}</p>
+                    <p>{{ error }}</p>
                 {% endfor %}
-            {% endfor %}
-        </div>
-    {% endif %}
+            </div>
+        {% endif %}
+    {% endwith %}
 {% endmacro %}
 
 {% macro render_field(field, this_wants_label=True) %}

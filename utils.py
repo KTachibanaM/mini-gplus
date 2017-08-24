@@ -1,5 +1,5 @@
 from urlparse import urlparse, urljoin
-from flask import request
+from flask import request, flash
 from wtforms.validators import Optional, DataRequired
 
 
@@ -8,6 +8,9 @@ def is_safe_url(target):
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and\
         ref_url.netloc == test_url.netloc
+
+def flash_error(error_msg):
+    flash(error_msg, 'error')
 
 
 class DataRequiredIf(object):

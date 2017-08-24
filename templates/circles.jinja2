@@ -1,5 +1,5 @@
 {% extends "base/_base_user.jinja2" %}
-{% from "_form.jinja2" import render_field, render_errors %}
+{% from "_form.jinja2" import render_field, render_flashed_errors %}
 {% block title %}Circles | mini-gplus{% endblock %}
 {% block content %}
     <div class="ui fluid raised card">
@@ -7,22 +7,22 @@
             <p>Create new circle</p>
         </div>
         <div class="content">
-            <form class="ui error form" method='post'>
+            <form class="ui error form" method='post' action="/add-circle">
                 <div class="fields">
                     <div class="twelve wide field">
                         {{ render_field(form.name, this_wants_label=False) }}
                     </div>
                     <div class="four wide field">
-                        <button class="ui fluid button">Create</button>
+                        <button class="ui fluid blue button">Create</button>
                     </div>
                 </div>
-                {{ render_errors(form) }}
+                {{ render_flashed_errors() }}
             </form>
         </div>
     </div>
     {% if circles %}
         {% for circle in circles %}
-            <form class="ui form" method="post" action="/rmcircle" style="display: inline">
+            <form class="ui form" method="post" action="/rm-circle" style="display: inline">
                 <input type="hidden" name="id" value="{{ circle.id }}" readonly>
                 <div class="ui raised fluid card">
                     <div class="content">
