@@ -4,7 +4,7 @@ from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
 from models import User, Circle, Post, Comment
-from utils import is_safe_url, flash_error
+from utils import flash_error
 from os import urandom
 from bson.objectid import ObjectId
 import os
