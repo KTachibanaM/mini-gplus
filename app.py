@@ -1,5 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, abort
-from mongoengine import NotUniqueError
+from flask import Flask, request, render_template, redirect, url_for
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
@@ -86,12 +85,12 @@ def add_post():
         Circle.objects(owner=current_user.id)
     )
     if create_new_post_form.validate():
-        new_post = Post()
-        new_post.author = current_user.id
-        new_post.content = create_new_post_form.content.data
-        new_post.is_public = create_new_post_form.is_public.data
-        new_post.circles = create_new_post_form.circles.data
-        new_post.save()
+        user = current_user  # type: User
+        user.create_post(
+            create_new_post_form.content.data,
+            create_new_post_form.is_public.data,
+            create_new_post_form.circles.data
+        )
     else:
         for error in create_new_post_form.all_errors_str:
             flash_error(error)

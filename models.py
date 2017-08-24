@@ -35,7 +35,6 @@ class User(Document, UserMixin):
     def check(user_id, password):
         """
         Check whether the user exists
-
         :param (str) user_id: user id
         :param (str) password: password
         :return (User|bool): Whether the user exists
@@ -52,6 +51,20 @@ class User(Document, UserMixin):
             return found_users[0]
         else:
             raise RuntimeError('More than one user for user id {} found!'.format(user_id))
+
+    def create_post(self, content, is_public, circles):
+        """
+        Create a post for the user
+        :param (str) content: the content
+        :param (bool) is_public: whether the post is public
+        :param (list[Circle]) circles: circles to share with
+        """
+        new_post = Post()
+        new_post.author = self.id
+        new_post.content = content
+        new_post.is_public = is_public
+        new_post.circles = circles
+        new_post.save()
 
 
 class Circle(Document):
