@@ -64,7 +64,25 @@ class Circle(Document):
         ]
     }
 
-    def is_member(self, user):
+    @staticmethod
+    def create(owner, name):
+        """
+        Create a circle
+        :param (User) owner: Owner of the circle
+        :param (str) name: Name of the circle
+        :return (bool): Whether creation is successful.
+            If False, name is already taken
+        """
+        new_circle = Circle()
+        new_circle.owner = owner.id
+        new_circle.name = name
+        try:
+            new_circle.save()
+        except NotUniqueError:
+            return False
+        return True
+
+    def check_member(self, user):
         return filter(lambda member: member.id == user.id, self.members)
 
 
@@ -90,7 +108,7 @@ class Post(Document, CreatedAtMixin):
             return True
         else:
             for circle in self.circles:
-                if circle.is_member(current_user):
+                if circle.check_member(current_user):
                     return True
         return False
 

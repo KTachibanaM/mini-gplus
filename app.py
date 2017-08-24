@@ -162,12 +162,7 @@ def add_circle():
     form = CreateNewCircleForm(request.form)
     if form.validate():
         new_circle_name = form.name.data
-        try:
-            new_circle = Circle()
-            new_circle.owner = current_user.id
-            new_circle.name = new_circle_name
-            new_circle.save()
-        except NotUniqueError:
+        if not Circle.create(current_user, new_circle_name):
             flash_error('{} already exists'.format(new_circle_name))
     else:
         for error in form.all_errors_str:
@@ -181,7 +176,7 @@ def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
     if circle.owner.id == current_user.id:
         toggled_user = User.objects.get(id=request.form.get('user_id'))
-        if circle.is_member(toggled_user):
+        if circle.check_member(toggled_user):
             circle.members.remove(toggled_user)
         else:
             circle.members.append(toggled_user)
