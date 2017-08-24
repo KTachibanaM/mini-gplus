@@ -111,12 +111,8 @@ def rm_post():
 def add_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     if post.shared_with(current_user):
-        new_comment = Comment()
-        new_comment.author = current_user.id
-        new_comment.content = request.form.get('content')
-        new_comment.save()
-        post.comments.append(new_comment)
-        post.save()
+        user = current_user  # type: User
+        user.create_comment(request.form.get('content'), post)
     return redirect(url_for('index'))
 
 

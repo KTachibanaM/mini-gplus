@@ -66,6 +66,19 @@ class User(Document, UserMixin):
         new_post.circles = circles
         new_post.save()
 
+    def create_comment(self, content, parent_post):
+        """
+        Create a comment for the user
+        :param (str) content: the content
+        :param (Post) parent_post: the post that this comment is attached to
+        """
+        new_comment = Comment()
+        new_comment.author = self.id
+        new_comment.content = content
+        new_comment.save()
+        parent_post.comments.append(new_comment)
+        parent_post.save()
+
 
 class Circle(Document):
     owner = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
