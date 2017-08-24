@@ -1,4 +1,4 @@
-from mongoengine import Document, ListField, BooleanField, ReferenceField, StringField, PULL, CASCADE
+from mongoengine import Document, ListField, BooleanField, ReferenceField, StringField, PULL, CASCADE, NotUniqueError
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -15,19 +15,43 @@ class User(Document, UserMixin):
 
     @staticmethod
     def create(user_id, password):
+        """
+        Create a user
+        :param (str) user_id: user id
+        :param (str) password: password
+        :return (bool): Whether creation is successful.
+            If False, id is already taken
+        """
         new_user = User()
         new_user.user_id = user_id
         new_user.password = generate_password_hash(password)
-        new_user.save()
+        try:
+            new_user.save()
+        except NotUniqueError:
+            return False
+        return True
 
     @staticmethod
     def check(user_id, password):
+        """
+        Check whether the user exists
+
+        :param (str) user_id: user id
+        :param (str) password: password
+        :return (User|bool): Whether the user exists
+        :exception (RuntimeError): If more than one user for the user id is found
+        """
         users = User.objects(user_id=user_id)
         found_users = []
         for user in users:
             if check_password_hash(user.password, password):
                 found_users.append(user)
-        return found_users
+        if not found_users:
+            return False
+        elif len(found_users) == 1:
+            return found_users[0]
+        else:
+            raise RuntimeError('More than one user for user id {} found!'.format(user_id))
 
 
 class Circle(Document):
@@ -40,7 +64,25 @@ class Circle(Document):
         ]
     }
 
-    def is_member(self, user):
+    @staticmethod
+    def create(owner, name):
+        """
+        Create a circle
+        :param (User) owner: Owner of the circle
+        :param (str) name: Name of the circle
+        :return (bool): Whether creation is successful.
+            If False, name is already taken
+        """
+        new_circle = Circle()
+        new_circle.owner = owner.id
+        new_circle.name = name
+        try:
+            new_circle.save()
+        except NotUniqueError:
+            return False
+        return True
+
+    def check_member(self, user):
         return filter(lambda member: member.id == user.id, self.members)
 
 
@@ -66,7 +108,7 @@ class Post(Document, CreatedAtMixin):
             return True
         else:
             for circle in self.circles:
-                if circle.is_member(current_user):
+                if circle.check_member(current_user):
                     return True
         return False
 

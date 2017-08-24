@@ -4,7 +4,7 @@ from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
 from models import User, Circle, Post, Comment
-from utils import is_safe_url, flash_error
+from utils import flash_error
 from os import urandom
 from bson.objectid import ObjectId
 import os
@@ -49,13 +49,11 @@ def index():
 def signin():
     signin_form = SigninForm(request.form)
     if signin_form.validate():
-        found_users = User.check(signin_form.id.data, signin_form.password.data)
-        if not found_users:
-            flash_error('Wrong id or password')
-        elif len(found_users) > 1:
-            return abort(500)
+        found_user = User.check(signin_form.id.data, signin_form.password.data)
+        if found_user:
+            login_user(found_user, remember=True)
         else:
-            login_user(found_users[0], remember=True)
+            flash_error('Wrong id or password')
     else:
         for error in signin_form.all_errors_str:
             flash_error(error)
@@ -71,12 +69,9 @@ def signup():
 def add_user():
     signup_form = SignupForm(request.form)
     if signup_form.validate():
-        try:
-            User.create(signup_form.id.data, signup_form.password.data)
-        except NotUniqueError:
-            flash_error('id {} is already taken'.format(signup_form.id.data))
-        else:
+        if User.create(signup_form.id.data, signup_form.password.data):
             return redirect(url_for('index'))
+        flash_error('id {} is already taken'.format(signup_form.id.data))
     for error in signup_form.all_errors_str:
         flash_error(error)
     return redirect(url_for('signup'))
@@ -167,12 +162,7 @@ def add_circle():
     form = CreateNewCircleForm(request.form)
     if form.validate():
         new_circle_name = form.name.data
-        try:
-            new_circle = Circle()
-            new_circle.owner = current_user.id
-            new_circle.name = new_circle_name
-            new_circle.save()
-        except NotUniqueError:
+        if not Circle.create(current_user, new_circle_name):
             flash_error('{} already exists'.format(new_circle_name))
     else:
         for error in form.all_errors_str:
@@ -186,7 +176,7 @@ def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
     if circle.owner.id == current_user.id:
         toggled_user = User.objects.get(id=request.form.get('user_id'))
-        if circle.is_member(toggled_user):
+        if circle.check_member(toggled_user):
             circle.members.remove(toggled_user)
         else:
             circle.members.append(toggled_user)
