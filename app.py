@@ -99,17 +99,24 @@ def rm_comment():
     return redirect(url_for('index'))
 
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/signup', methods=['GET'])
 def signup():
+    return render_template('signup.jinja2', form=SignupForm())
+
+
+@app.route('/add-user', methods=['POST'])
+def add_user():
     signup_form = SignupForm(request.form)
-    if request.method == 'POST' and signup_form.validate():
+    if signup_form.validate():
         try:
             User.create(signup_form.id.data, signup_form.password.data)
         except NotUniqueError:
-            signup_form.id.errors.append('id {} is already taken'.format(signup_form.id.data))
+            flash_error('id {} is already taken'.format(signup_form.id.data))
         else:
             return redirect(url_for('index'))
-    return render_template('signup.jinja2', form=signup_form)
+    for error in signup_form.all_errors_str:
+        flash_error(error)
+    return redirect(url_for('signup'))
 
 
 @app.route('/signout')
