@@ -94,7 +94,12 @@ class Circle(Document):
         self.save()
 
     def check_member(self, user):
-        return filter(lambda member: member.id == user.id, self.members)
+        """
+        Check whether a user is in the circle
+        :param (User) user: checked user
+        :return (bool): whether the user is in the circle
+        """
+        return len(filter(lambda member: member.id == user.id, self.members)) != 0
 
 
 class Comment(Document, CreatedAtMixin):
