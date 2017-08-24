@@ -15,7 +15,7 @@
                             <form method="post" action="/toggle-member" style="display: inline">
                                 <input type="hidden" name="user_id" value="{{ user.id }}">
                                 <input type="hidden" name="circle_id" value="{{ circle.id }}">
-                                {% if circle.is_member(user) %}
+                                {% if circle.check_member(user) %}
                                     <button class="ui labeled icon red button">
                                         <i class="minus icon"></i>
                                         {{ circle.name }}
