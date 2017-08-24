@@ -49,13 +49,11 @@ def index():
 def signin():
     signin_form = SigninForm(request.form)
     if signin_form.validate():
-        found_users = User.check(signin_form.id.data, signin_form.password.data)
-        if not found_users:
-            flash_error('Wrong id or password')
-        elif len(found_users) > 1:
-            return abort(500)
+        found_user = User.check(signin_form.id.data, signin_form.password.data)
+        if found_user:
+            login_user(found_user, remember=True)
         else:
-            login_user(found_users[0], remember=True)
+            flash_error('Wrong id or password')
     else:
         for error in signin_form.all_errors_str:
             flash_error(error)
@@ -71,12 +69,9 @@ def signup():
 def add_user():
     signup_form = SignupForm(request.form)
     if signup_form.validate():
-        try:
-            User.create(signup_form.id.data, signup_form.password.data)
-        except NotUniqueError:
-            flash_error('id {} is already taken'.format(signup_form.id.data))
-        else:
+        if User.create(signup_form.id.data, signup_form.password.data):
             return redirect(url_for('index'))
+        flash_error('id {} is already taken'.format(signup_form.id.data))
     for error in signup_form.all_errors_str:
         flash_error(error)
     return redirect(url_for('signup'))
