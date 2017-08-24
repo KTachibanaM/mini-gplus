@@ -68,8 +68,8 @@ class Circle(Document):
     def create(owner, name):
         """
         Create a circle
-        :param (User) owner: Owner of the circle
-        :param (str) name: Name of the circle
+        :param (User) owner: owner of the circle
+        :param (str) name: name of the circle
         :return (bool): Whether creation is successful.
             If False, name is already taken
         """
@@ -81,6 +81,17 @@ class Circle(Document):
         except NotUniqueError:
             return False
         return True
+
+    def toggle_member(self, toggled_user):
+        """
+        Toggle a user's membership in the circle
+        :param (User) toggled_user: toggled user
+        """
+        if self.check_member(toggled_user):
+            self.members.remove(toggled_user)
+        else:
+            self.members.append(toggled_user)
+        self.save()
 
     def check_member(self, user):
         return filter(lambda member: member.id == user.id, self.members)

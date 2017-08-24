@@ -175,12 +175,7 @@ def add_circle():
 def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
     if circle.owner.id == current_user.id:
-        toggled_user = User.objects.get(id=request.form.get('user_id'))
-        if circle.check_member(toggled_user):
-            circle.members.remove(toggled_user)
-        else:
-            circle.members.append(toggled_user)
-        circle.save()
+        circle.toggle_member(User.objects.get(id=request.form.get('user_id')))
     return redirect(url_for('users'))
 
 
