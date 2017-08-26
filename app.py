@@ -143,7 +143,7 @@ def add_circle():
     create_new_circle_form = CreateNewCircleForm(request.form)
     if create_new_circle_form.validate():
         new_circle_name = create_new_circle_form.name.data
-        if not Circle.create(user, new_circle_name):
+        if not user.create_circle(new_circle_name):
             flash_error('{} already exists'.format(new_circle_name))
     create_new_circle_form.flash_all_errors()
     return redirect(url_for('circles'))
@@ -153,9 +153,10 @@ def add_circle():
 @login_required
 def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
-    if circle.owner.id == user.id:
-        circle.toggle_member(User.objects.get(id=request.form.get('user_id')))
-    return redirect(url_for('users'))
+    toggled_user = User.objects.get(id=request.form.get('user_id'))
+    if user.toggle_member(circle, toggled_user):
+        return redirect(url_for('users'))
+    abort(401)
 
 
 @app.route('/rm-circle', methods=['POST'])

@@ -49,24 +49,3 @@ class UserTests(MongomockTestCase):
     def test_check_wrong_password(self):
         User.create('username', 'password')
         self.assertFalse(User.check('username', 'wrong password'))
-
-
-class CircleTests(MongomockTestCase):
-    def __init__(self, *args, **kwargs):
-        super(CircleTests, self).__init__(*args, **kwargs)
-        self._mongo_document_classes.append(User)
-        self._mongo_document_classes.append(Circle)
-
-    def setUp(self):
-        super(CircleTests, self).setUp()
-        User.create('username', 'password')
-        self.current_user = User.objects.get(user_id='username')
-
-    def test_create(self):
-        self.assertTrue(Circle.create(self.current_user, 'circle'))
-        self.assertEqual(len(Circle.objects(owner=self.current_user, name='circle')), 1)
-
-    def test_create_duplicate_name(self):
-        self.assertTrue(Circle.create(self.current_user, 'circle'))
-        self.assertFalse(Circle.create(self.current_user, 'circle'))
-        self.assertEqual(len(Circle.objects(owner=self.current_user, name='circle')), 1)

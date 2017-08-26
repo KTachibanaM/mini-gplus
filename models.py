@@ -13,6 +13,8 @@ class User(Document, UserMixin):
     user_id = StringField(required=True, unique=True)
     password = StringField(required=True)
 
+    # User
+
     @staticmethod
     def create(user_id, password):
         """
@@ -52,6 +54,8 @@ class User(Document, UserMixin):
         else:
             raise RuntimeError('More than one user for user id {} found!'.format(user_id))
 
+    # Post
+
     def create_post(self, content, is_public, circles):
         """
         Create a post for the user
@@ -65,24 +69,6 @@ class User(Document, UserMixin):
         new_post.is_public = is_public
         new_post.circles = circles
         new_post.save()
-
-    def create_comment(self, content, parent_post):
-        """
-        Create a comment for the user
-        :param (str) content: the content
-        :param (Post) parent_post: the post that this comment is attached to
-        :return (bool): whether it's authorized
-        """
-        if self.sees_post(parent_post):
-            new_comment = Comment()
-            new_comment.author = self.id
-            new_comment.content = content
-            new_comment.save()
-            parent_post.comments.append(new_comment)
-            parent_post.save()
-            return True
-        else:
-            return False
 
     def owns_post(self, post):
         """
@@ -133,6 +119,26 @@ class User(Document, UserMixin):
         posts = filter(lambda post: self.sees_post(post), posts)
         return list(reversed(sorted(posts, key=lambda post: post.created_at)))
 
+    # Comment
+
+    def create_comment(self, content, parent_post):
+        """
+        Create a comment for the user
+        :param (str) content: the content
+        :param (Post) parent_post: the post that this comment is attached to
+        :return (bool): whether it's authorized
+        """
+        if self.sees_post(parent_post):
+            new_comment = Comment()
+            new_comment.author = self.id
+            new_comment.content = content
+            new_comment.save()
+            parent_post.comments.append(new_comment)
+            parent_post.save()
+            return True
+        else:
+            return False
+
     def owns_comment(self, comment, parent_post):
         """
         Whether the user owns a comment
@@ -156,6 +162,41 @@ class User(Document, UserMixin):
         else:
             return False
 
+    # Circle
+
+    def create_circle(self, name):
+        """
+        Create a circle
+        :param (str) name: name of the circle
+        :return (bool): Whether creation is successful.
+            If False, name is already taken
+        """
+        new_circle = Circle()
+        new_circle.owner = self.id
+        new_circle.name = name
+        try:
+            new_circle.save()
+        except NotUniqueError:
+            return False
+        return True
+
+    def toggle_member(self, circle, toggled_user):
+        """
+        Toggle a user's membership in a circle
+        :param (Circle) circle: the circle
+        :param (User) toggled_user: toggled user
+        :returns (bool): whether it's authorized
+        """
+        if circle.owner.id == self.id:
+            if circle.check_member(toggled_user):
+                circle.members.remove(toggled_user)
+            else:
+                circle.members.append(toggled_user)
+            circle.save()
+            return True
+        else:
+            return False
+
 
 class Circle(Document):
     owner = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
@@ -166,35 +207,6 @@ class Circle(Document):
             {'fields': ('owner', 'name'), 'unique': True}
         ]
     }
-
-    @staticmethod
-    def create(owner, name):
-        """
-        Create a circle
-        :param (User) owner: owner of the circle
-        :param (str) name: name of the circle
-        :return (bool): Whether creation is successful.
-            If False, name is already taken
-        """
-        new_circle = Circle()
-        new_circle.owner = owner.id
-        new_circle.name = name
-        try:
-            new_circle.save()
-        except NotUniqueError:
-            return False
-        return True
-
-    def toggle_member(self, toggled_user):
-        """
-        Toggle a user's membership in the circle
-        :param (User) toggled_user: toggled user
-        """
-        if self.check_member(toggled_user):
-            self.members.remove(toggled_user)
-        else:
-            self.members.append(toggled_user)
-        self.save()
 
     def check_member(self, user):
         """
