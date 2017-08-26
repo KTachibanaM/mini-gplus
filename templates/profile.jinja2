@@ -1,11 +1,11 @@
 {% extends "base/_base_user.jinja2" %}
-{% from "cards/_post.jinja2" import render_post %}
-{% from "cards/_share.jinja2" import render_share %}
-{% block title %}{{ user_id }} | mini-gplus{% endblock %}
+{% from "cards/_post.jinja2" import render_post with context %}
+{% from "cards/_share.jinja2" import render_share with context %}
+{% block title %}{{ profile_user.user_id }} | mini-gplus{% endblock %}
 {% block content %}
     {% if posts %}
         {% for post in posts %}
-            {{ render_post(post, current_user) }}
+            {{ render_post(post) }}
         {% endfor %}
     {% else %}
         <p>No posts</p>

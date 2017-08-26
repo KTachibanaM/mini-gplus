@@ -1,7 +1,9 @@
-{% macro render_post(post, current_user) %}
+{% from "cards/_comment.jinja2" import render_comment with context %}
+
+{% macro render_post(post) %}
     <div class="ui fluid raised card">
         <div class="content">
-            {% if current_user.owns_post(post) %}
+            {% if user.owns_post(post) %}
                 <form method="post" action="/rm-post">
                     <input type="hidden" name="id" value="{{ post.id }}" readonly>
                     <button class="ui right floated icon negative button">
@@ -13,7 +15,7 @@
                 {{ post.author.user_id }}
             </a>
             <div class="meta">
-                {% if current_user.owns_post(post) %}
+                {% if user.owns_post(post) %}
                     {{ post.created_at }} to {{ post.sharing_scope_str }}
                 {% else %}
                     {{ post.created_at }}
@@ -21,36 +23,13 @@
             </div>
         </div>
         <div class="content">
-            <div class="description">
-                <p>
-                    {{ post.content }}
-                </p>
-            </div>
+            {{ post.content }}
         </div>
         {% if post.comments %}
             <div class="content">
                 <div class="ui comments">
                     {% for comment in post.comments %}
-                        <div class="ui comment">
-                            <div class="content">
-                                <a class="author" href="/profile/{{ comment.author.user_id }}">
-                                    {{ comment.author.user_id }}
-                                </a>
-                                <div class="metadata">
-                                    <span class="date">{{ comment.created_at }}</span>
-                                </div>
-                                {% if current_user.owns_comment(comment, post) %}
-                                    <form method="post" action="/rm-comment" style="display: inline">
-                                        <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
-                                        <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
-                                        <button class="mini ui red button">delete</button>
-                                    </form>
-                                {% endif %}
-                                <div class="text">
-                                    {{ comment.content }}
-                                </div>
-                            </div>
-                        </div>
+                        {{ render_comment(comment, post) }}
                     {% endfor %}
                 </div>
             </div>

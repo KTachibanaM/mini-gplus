@@ -10,14 +10,15 @@
                 <div class="fields">
                     <div class="four wide field">
                         <div class="ui slider checkbox">
-                            {{ render_field(share_form.is_public) }}
+                            <input id="{{ share_form.is_public.name }}" name="{{ share_form.is_public.name }}" type="checkbox">
+                            {{ share_form.is_public.label }}
                         </div>
                     </div>
                     <div class="eight wide field">
                         {{ render_field(share_form.circles, this_wants_label=False, class="ui dropdown") }}
                     </div>
                     <div class="four wide field">
-                        <button class="ui fluid green button">Post</button>
+                        <button class="ui fluid positive button">Post</button>
                     </div>
                 </div>
                 {{ render_flashed_errors() }}
