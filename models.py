@@ -1,6 +1,7 @@
 from mongoengine import Document, ListField, BooleanField, ReferenceField, StringField, PULL, CASCADE, NotUniqueError
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from custom_exceptions import UnauthorizedAccess
 
 
 class CreatedAtMixin(object):
@@ -98,13 +99,12 @@ class User(Document, UserMixin):
         """
         Delete a post
         :param (Post) post: the post
-        :return (bool): whether it's authorized
+        :raise (UnauthorizedAccess) when access is unauthorized
         """
         if post.author.id == self.id:
             post.delete()
-            return True
         else:
-            return False
+            raise UnauthorizedAccess()
 
     def sees_posts(self, by_user=None):
         """
@@ -126,7 +126,7 @@ class User(Document, UserMixin):
         Create a comment for the user
         :param (str) content: the content
         :param (Post) parent_post: the post that this comment is attached to
-        :return (bool): whether it's authorized
+        :raise (UnauthorizedAccess) when access is unauthorized
         """
         if self.sees_post(parent_post):
             new_comment = Comment()
@@ -135,9 +135,26 @@ class User(Document, UserMixin):
             new_comment.save()
             parent_post.comments.append(new_comment)
             parent_post.save()
-            return True
         else:
-            return False
+            raise UnauthorizedAccess()
+
+    def create_nested_comment(self, content, parent_comment, parent_post):
+        """
+        Create a nested comment for the user
+        :param (str) content: the content
+        :param (Comment) parent_comment: the comment that this nested comment is attached to
+        :param (Post) parent_post: the post that this comment is attached to
+        :raise (UnauthorizedAccess) when access is unauthorized
+        """
+        if self.sees_post(parent_post):
+            new_comment = Comment()
+            new_comment.author = self.id
+            new_comment.content = content
+            new_comment.save()
+            parent_comment.comments.append(new_comment)
+            parent_comment.save()
+        else:
+            raise UnauthorizedAccess()
 
     def owns_comment(self, comment, parent_post):
         """
@@ -153,14 +170,13 @@ class User(Document, UserMixin):
         Delete a comment
         :param (Comment) comment: the comment
         :param (Post) parent_post: comment's parent post
-        :return: whether it's authorized
+        :raise (UnauthorizedAccess) when access is unauthorized
         """
         if self.owns_comment(comment, parent_post):
             parent_post.comments.remove(comment)
             comment.delete()
-            return True
         else:
-            return False
+            raise UnauthorizedAccess()
 
     # Circle
 
@@ -185,7 +201,7 @@ class User(Document, UserMixin):
         Toggle a user's membership in a circle
         :param (Circle) circle: the circle
         :param (User) toggled_user: toggled user
-        :returns (bool): whether it's authorized
+        :raise (UnauthorizedAccess) when access is unauthorized
         """
         if circle.owner.id == self.id:
             if circle.check_member(toggled_user):
@@ -193,21 +209,19 @@ class User(Document, UserMixin):
             else:
                 circle.members.append(toggled_user)
             circle.save()
-            return True
         else:
-            return False
+            raise UnauthorizedAccess()
 
     def delete_circle(self, circle):
         """
         Delete a circle
         :param (Circle) circle: the circle
-        :return (bool): whether it's authorized
+        :raise (UnauthorizedAccess) when access is unauthorized
         """
         if circle.owner.id == self.id:
             circle.delete()
-            return True
         else:
-            return False
+            raise UnauthorizedAccess()
 
 
 class Circle(Document):
@@ -232,6 +246,7 @@ class Circle(Document):
 class Comment(Document, CreatedAtMixin):
     author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
     content = StringField(required=True)
+    comments = ListField(ReferenceField('Comment', reverse_delete_rule=PULL), default=[])  # type: list[Comment]
 
 
 class Post(Document, CreatedAtMixin):

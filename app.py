@@ -7,6 +7,7 @@ from utils import flash_error
 from os import urandom
 import os
 from pymongo.uri_parser import parse_uri
+from custom_exceptions import UnauthorizedAccess
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = urandom(24)
@@ -68,8 +69,8 @@ def add_user():
     return redirect(url_for('signup'))
 
 
-@app.errorhandler(401)
-def not_authorized(error):
+@app.errorhandler(UnauthorizedAccess)
+def unauthorized(error):
     return 'Not authorized'
 
 
@@ -90,18 +91,24 @@ def add_post():
 @login_required
 def rm_post():
     post = Post.objects.get(id=request.form.get('id'))
-    if user.delete_post(post):
-        return redirect(url_for('index'))
-    abort(401)
+    user.delete_post(post)
+    return redirect(url_for('index'))
 
 
 @app.route('/add-comment', methods=['POST'])
 @login_required
 def add_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
-    if user.create_comment(request.form.get('content'), post):
-        return redirect(url_for('index'))
-    abort(401)
+    user.create_comment(request.form.get('content'), post)
+    return redirect(url_for('index'))
+
+
+@app.route('/add-nested-comment', methods=['POST'])
+def add_nested_comment():
+    post = Post.objects.get(id=request.form.get('post_id'))
+    comment = Comment.objects.get(id=request.form.get('comment_id'))
+    user.create_nested_comment(request.form.get('content'), comment, post)
+    return redirect(url_for('index'))
 
 
 @app.route('/rm-comment', methods=['POST'])
@@ -109,9 +116,8 @@ def add_comment():
 def rm_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
-    if user.delete_comment(comment, post):
-        return redirect(url_for('index'))
-    abort(401)
+    user.delete_comment(comment, post)
+    return redirect(url_for('index'))
 
 
 @app.route('/signout')
@@ -154,18 +160,16 @@ def add_circle():
 def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
     toggled_user = User.objects.get(id=request.form.get('user_id'))
-    if user.toggle_member(circle, toggled_user):
-        return redirect(url_for('users'))
-    abort(401)
+    user.toggle_member(circle, toggled_user)
+    return redirect(url_for('users'))
 
 
 @app.route('/rm-circle', methods=['POST'])
 @login_required
 def rm_circle():
     circle = Circle.objects.get(id=request.form.get('id'))
-    if user.delete_circle(circle):
-        return redirect(url_for('circles'))
-    abort(401)
+    user.delete_circle(circle)
+    return redirect(url_for('circles'))
 
 
 @app.route('/profile', methods=['GET'])
