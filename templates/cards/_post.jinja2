@@ -2,28 +2,32 @@
 
 {% macro render_post(post) %}
     <div class="ui fluid raised card">
-        <div class="content">
-            {% if user.owns_post(post) %}
-                <form method="post" action="/rm-post">
-                    <input type="hidden" name="id" value="{{ post.id }}" readonly>
-                    <button class="ui right floated icon negative button">
-                        <i class="trash icon"></i>
-                    </button>
-                </form>
-            {% endif %}
-            <a class="author" href="/profile/{{ post.author.user_id }}">
-                {{ post.author.user_id }}
-            </a>
-            <div class="meta">
-                {% if user.owns_post(post) %}
-                    {{ post.created_at }} to {{ post.sharing_scope_str }}
-                {% else %}
-                    {{ post.created_at }}
-                {% endif %}
+        <div class="ui content comments">
+            <div class="comment">
+                <a class="author" href="/profile/{{ post.author.user_id }}">
+                    {{ post.author.user_id }}
+                </a>
+                <div class="metadata">
+                    <span class="date">
+                        {% if user.owns_post(post) %}
+                            {{ post.created_at }} to {{ post.sharing_scope_str }}
+                        {% else %}
+                            {{ post.created_at }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="text">
+                    {{ post.content }}
+                </div>
+                <div class="actions">
+                    {% if user.owns_post(post) %}
+                        <form method="post" action="/rm-post">
+                            <input type="hidden" name="id" value="{{ post.id }}" readonly>
+                            <button class="comment-action">Delete</button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
-        </div>
-        <div class="content">
-            {{ post.content }}
         </div>
         {% if post.comments %}
             <div class="content">
