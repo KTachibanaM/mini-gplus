@@ -1,3 +1,30 @@
+{% macro render_nested_comment(comment, parent_comment, post, current_user) %}
+    <div class="comment">
+        <a class="author" href="/profile/{{ comment.author.user_id }}">
+            {{ comment.author.user_id }}
+        </a>
+        <div class="metadata">
+            <span class="date">{{ comment.created_at }}</span>
+        </div>
+        <div class="text">
+            {{ comment.content }}
+        </div>
+        {% if comment.comments %}
+            <div class="comments">
+                {% for nested_comment in comment.comments %}
+                    {{ render_nested_comment(nested_comment, comment, post, current_user) }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form method="post" action="/add-nested-comment">
+            <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
+            <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
+            <input name="content"/>
+            <button>Comment</button>
+        </form>
+    </div>
+{% endmacro %}
+
 {% macro render_comment(comment, post, current_user) %}
     <div class="comment">
         <div class="content">
@@ -14,9 +41,22 @@
                     <button class="mini ui red button">delete</button>
                 </form>
             {% endif %}
-            <div class="text">
+            <div class="content">
                 {{ comment.content }}
             </div>
+            {% if comment.comments %}
+                <div class="comments">
+                    {% for nested_comment in comment.comments %}
+                        {{ render_nested_comment(nested_comment, comment, post, current_user) }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <form method="post" action="/add-nested-comment" style="display: inline">
+                <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
+                <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
+                <input name="content"/>
+                <button>Comment</button>
+            </form>
         </div>
     </div>
 {% endmacro %}
