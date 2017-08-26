@@ -1,0 +1,10 @@
+{% extends "base/_base.jinja2" %}
+{% block title %}{% endblock %}
+{% block body %}
+    <header class="ui fixed menu">
+        {% block header %}{% endblock %}
+    </header>
+    <article class="ui main container">
+        {% block content %}{% endblock %}
+    </article>
+{% endblock %}

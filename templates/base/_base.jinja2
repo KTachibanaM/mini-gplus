@@ -18,12 +18,7 @@
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
     your browser</a> to improve your experience.</p>
 <![endif]-->
-<header class="ui fixed menu">
-    {% block header %}{% endblock %}
-</header>
-<article class="ui main container">
-    {% block content %}{% endblock %}
-</article>
+{% block body %}{% endblock %}
 <!-- Custom JS -->
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
