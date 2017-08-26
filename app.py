@@ -86,7 +86,7 @@ def add_post():
 @login_required
 def rm_post():
     post = Post.objects.get(id=request.form.get('id'))
-    if post.author.id == current_user.id:
+    if post.author.id == user.id:
         post.delete()
     return redirect(url_for('index'))
 
@@ -123,8 +123,8 @@ def signout():
 def users():
     return render_template(
         'users.jinja2',
-        users=User.objects(id__ne=current_user.id),
-        circles=Circle.objects(owner=current_user.id)
+        users=User.objects(id__ne=user.id),
+        circles=Circle.objects(owner=user.id)
     )
 
 
@@ -132,7 +132,7 @@ def users():
 @login_required
 def circles():
     form = CreateNewCircleForm()
-    return render_template('circles.jinja2', form=form, circles=Circle.objects(owner=current_user.id))
+    return render_template('circles.jinja2', form=form, circles=Circle.objects(owner=user.id))
 
 
 @app.route('/add-circle', methods=['POST'])
@@ -141,7 +141,7 @@ def add_circle():
     create_new_circle_form = CreateNewCircleForm(request.form)
     if create_new_circle_form.validate():
         new_circle_name = create_new_circle_form.name.data
-        if not Circle.create(current_user, new_circle_name):
+        if not Circle.create(user, new_circle_name):
             flash_error('{} already exists'.format(new_circle_name))
     create_new_circle_form.flash_all_errors()
     return redirect(url_for('circles'))
@@ -151,7 +151,7 @@ def add_circle():
 @login_required
 def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
-    if circle.owner.id == current_user.id:
+    if circle.owner.id == user.id:
         circle.toggle_member(User.objects.get(id=request.form.get('user_id')))
     return redirect(url_for('users'))
 
@@ -160,7 +160,7 @@ def toggle_member():
 @login_required
 def rm_circle():
     circle = Circle.objects.get(id=request.form.get('id'))
-    if circle.owner.id == current_user.id:
+    if circle.owner.id == user.id:
         circle.delete()
     return redirect(url_for('circles'))
 
