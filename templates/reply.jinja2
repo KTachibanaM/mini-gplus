@@ -4,14 +4,18 @@
     <a class="item">Reply</a>
 {% endblock %}
 {% block content %}
-    <form class="ui form" method="post" action="/add-nested-comment">
+    {% if not comment_id %}
+        <form class="ui form" method="post" action="/add-comment">
+    {% else %}
+        <form class="ui form" method="post" action="/add-nested-comment">
+    {% endif %}
         <input type="hidden" name="post_id" value="{{ post_id }}" readonly>
         <input type="hidden" name="comment_id" value="{{ comment_id }}" readonly>
         <div class="field">
             <input name="content"/>
         </div>
         <div class="field">
-            <button class="ui blue button">Comment</button>
+            <button class="ui blue button">Reply</button>
         </div>
     </form>
 {% endblock %}

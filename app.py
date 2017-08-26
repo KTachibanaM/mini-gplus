@@ -100,10 +100,11 @@ def rm_post():
     return redirect(url_for('index'))
 
 
+@app.route('/reply/<post_id>')
 @app.route('/reply/<post_id>/<comment_id>')
 @login_required
 # TODO: authorized?
-def reply(post_id, comment_id):
+def reply(post_id, comment_id=None):
     return render_template('reply.jinja2', post_id=post_id, comment_id=comment_id)
 
 

@@ -21,7 +21,7 @@
                 </div>
                 <div class="actions">
                     <button class="comment-action">
-                        <a href="/reply/{{ post.id }}">Comment</a>
+                        <a href="/reply/{{ post.id }}">Reply</a>
                     </button>
                     {% if user.owns_post(post) %}
                         <form method="post" action="/rm-post" style="display: inline;">
@@ -41,18 +41,5 @@
                 </div>
             </div>
         {% endif %}
-        <div class="extra content">
-            <form class="ui form" method="post" action="/add-comment">
-                <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
-                <div class="fields">
-                    <div class="twelve wide field">
-                        <input name="content"/>
-                    </div>
-                    <div class="four wide field">
-                        <button class="ui fluid blue button">Comment</button>
-                    </div>
-                </div>
-            </form>
-        </div>
     </div>
 {% endmacro %}
