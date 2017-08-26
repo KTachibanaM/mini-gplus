@@ -1,4 +1,4 @@
-{% macro render_nested_comment(comment, parent_comment, post, current_user) %}
+{% macro render_nested_comment(comment, parent_comment, post) %}
     <div class="comment">
         <a class="author" href="/profile/{{ comment.author.user_id }}">
             {{ comment.author.user_id }}
@@ -12,7 +12,7 @@
         {% if comment.comments %}
             <div class="comments">
                 {% for nested_comment in comment.comments %}
-                    {{ render_nested_comment(nested_comment, comment, post, current_user) }}
+                    {{ render_nested_comment(nested_comment, comment, post) }}
                 {% endfor %}
             </div>
         {% endif %}
@@ -25,7 +25,7 @@
     </div>
 {% endmacro %}
 
-{% macro render_comment(comment, post, current_user) %}
+{% macro render_comment(comment, post) %}
     <div class="comment">
         <div class="content">
             <a class="author" href="/profile/{{ comment.author.user_id }}">
@@ -39,7 +39,7 @@
             </div>
             <div class="actions">
                 <button class="comment-action">Reply</button>
-                {% if current_user.owns_comment(comment, post) %}
+                {% if user.owns_comment(comment, post) %}
                     <form method="post" action="/rm-comment" style="display: inline">
                         <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
                         <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
@@ -50,7 +50,7 @@
             {% if comment.comments %}
                 <div class="comments">
                     {% for nested_comment in comment.comments %}
-                        {{ render_nested_comment(nested_comment, comment, post, current_user) }}
+                        {{ render_nested_comment(nested_comment, comment, post) }}
                     {% endfor %}
                 </div>
             {% endif %}

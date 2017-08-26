@@ -1,12 +1,12 @@
 {% extends "base/_base_user.jinja2" %}
-{% from "cards/_post.jinja2" import render_post %}
-{% from "cards/_share.jinja2" import render_share %}
+{% from "cards/_post.jinja2" import render_post with context %}
+{% from "cards/_share.jinja2" import render_share with context %}
 {% block title %}mini-gplus{% endblock %}
 {% block content %}
     {{ render_share(form) }}
     {% if posts %}
         {% for post in posts %}
-            {{ render_post(post, current_user) }}
+            {{ render_post(post) }}
         {% endfor %}
     {% else %}
         <p>You have reached end of the stream</p>

@@ -1,9 +1,9 @@
-{% from "cards/_comment.jinja2" import render_comment %}
+{% from "cards/_comment.jinja2" import render_comment with context %}
 
-{% macro render_post(post, current_user) %}
+{% macro render_post(post) %}
     <div class="ui fluid raised card">
         <div class="content">
-            {% if current_user.owns_post(post) %}
+            {% if user.owns_post(post) %}
                 <form method="post" action="/rm-post">
                     <input type="hidden" name="id" value="{{ post.id }}" readonly>
                     <button class="ui right floated icon negative button">
@@ -15,7 +15,7 @@
                 {{ post.author.user_id }}
             </a>
             <div class="meta">
-                {% if current_user.owns_post(post) %}
+                {% if user.owns_post(post) %}
                     {{ post.created_at }} to {{ post.sharing_scope_str }}
                 {% else %}
                     {{ post.created_at }}
@@ -29,7 +29,7 @@
             <div class="content">
                 <div class="ui threaded comments">
                     {% for comment in post.comments %}
-                        {{ render_comment(comment, post, current_user) }}
+                        {{ render_comment(comment, post) }}
                     {% endfor %}
                 </div>
             </div>

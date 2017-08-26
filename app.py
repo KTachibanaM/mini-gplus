@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, abort
+from flask import Flask, request, render_template, redirect, url_for
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
@@ -27,6 +27,11 @@ app.session_interface = MongoEngineSessionInterface(db)
 @login_manager.user_loader
 def load_user(loaded_id):
     return User.objects.get(id=loaded_id)
+
+
+@app.context_processor
+def inject_user():
+    return dict(user=current_user)
 
 user = current_user  # type: User
 
@@ -182,7 +187,7 @@ def profile():
 @login_required
 def public_profile(user_id):
     profile_user = User.objects.get(user_id=user_id)
-    return render_template('profile.jinja2', user_id=user_id, posts=user.sees_posts(profile_user))
+    return render_template('profile.jinja2', profile_user=profile_user, posts=user.sees_posts(profile_user))
 
 if __name__ == '__main__':
     app.run()
