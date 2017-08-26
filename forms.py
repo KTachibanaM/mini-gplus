@@ -1,6 +1,7 @@
 from wtforms import Form, StringField, BooleanField, PasswordField, TextAreaField, validators, SelectMultipleField
 from utils import DataRequiredIf
 from bson.objectid import ObjectId
+from models import Circle
 
 
 class AllErrorsStrMixin(object):
@@ -46,3 +47,15 @@ class CreateNewPostForm(Form, AllErrorsStrMixin):
     circles = SelectMultipleField('Circles', [
         DataRequiredIf(is_public=False)
     ], ObjectId)
+
+    def __init__(self, circles, *args, **kwargs):
+        """
+        :param (list[Circle]) circles: circles
+        :param args:
+        :param kwargs:
+        """
+        super(CreateNewPostForm, self).__init__(*args, **kwargs)
+        self.circles.choices = map(
+            lambda circle: (circle.id, circle.name),
+            circles
+        )

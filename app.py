@@ -35,11 +35,7 @@ def index():
     if not current_user.is_authenticated:
         return render_template('signin.jinja2', form=SigninForm())
     else:
-        create_new_post_form = CreateNewPostForm()
-        create_new_post_form.circles.choices = map(
-            lambda circle: (circle.id, circle.name),
-            Circle.objects(owner=current_user.id)
-        )
+        create_new_post_form = CreateNewPostForm(Circle.objects(owner=user.id))
         return render_template('index.jinja2', form=create_new_post_form, posts=user.sees_posts())
 
 
@@ -78,11 +74,7 @@ def add_user():
 @app.route('/add-post', methods=['POST'])
 @login_required
 def add_post():
-    create_new_post_form = CreateNewPostForm(request.form)
-    create_new_post_form.circles.choices = map(
-        lambda circle: (circle.id, circle.name),
-        Circle.objects(owner=current_user.id)
-    )
+    create_new_post_form = CreateNewPostForm(Circle.objects(owner=user.id), request.form)
     if create_new_post_form.validate():
         user.create_post(
             create_new_post_form.content.data,
