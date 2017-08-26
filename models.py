@@ -161,9 +161,21 @@ class User(Document, UserMixin):
         Whether the user owns a comment
         :param (Comment) comment: the comment
         :param (Post) parent_post: its parent post
-        :return (bool): whether hte user owns a comment
+        :return (bool): whether the user owns a comment
         """
         return self.owns_post(parent_post) or self.id == comment.author.id
+
+    def owns_nested_comment(self, comment, parent_comment, parent_post):
+        """
+        Whether the user owns a nested comment
+        :param (Comment) comment: the comment
+        :param (Comment) parent_comment: comment's parent comment
+        :param (Post) parent_post: parent comment's parent post
+        :return (bool): whether the user owns the nested comment
+        """
+        return self.owns_post(parent_post) \
+            or self.owns_comment(parent_comment, parent_post) \
+            or self.id == comment.author.id
 
     def delete_comment(self, comment, parent_post):
         """
@@ -174,6 +186,20 @@ class User(Document, UserMixin):
         """
         if self.owns_comment(comment, parent_post):
             parent_post.comments.remove(comment)
+            comment.delete()
+        else:
+            raise UnauthorizedAccess()
+
+    def delete_nested_comment(self, comment, parent_comment, parent_post):
+        """
+        Delete a nested comment
+        :param (Comment) comment: the comment
+        :param (Comment) parent_comment: comment's parent comment
+        :param (Post) parent_post: parent comment's parent post
+        :raise (UnauthorizedAccess) when access is unauthorized
+        """
+        if self.owns_comment(parent_comment, parent_post):
+            parent_comment.comments.remove(comment)
             comment.delete()
         else:
             raise UnauthorizedAccess()
