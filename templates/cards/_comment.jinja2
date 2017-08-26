@@ -9,6 +9,18 @@
         <div class="text">
             {{ comment.content }}
         </div>
+        <div class="actions">
+            <button class="comment-action">
+                <a href="/reply/{{ post.id }}/{{ comment.id }}">Reply</a>
+            </button>
+{#            {% if user.owns_comment(comment, post) %}#}
+{#                <form method="post" action="/rm-comment" style="display: inline">#}
+{#                    <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>#}
+{#                    <input type="hidden" name="post_id" value="{{ post.id }}" readonly>#}
+{#                    <button class="comment-action">Delete</button>#}
+{#                </form>#}
+{#            {% endif %}#}
+        </div>
         {% if comment.comments %}
             <div class="comments">
                 {% for nested_comment in comment.comments %}
@@ -16,12 +28,6 @@
                 {% endfor %}
             </div>
         {% endif %}
-        {#        <form method="post" action="/add-nested-comment">#}
-        {#            <input type="hidden" name="post_id" value="{{ post.id }}" readonly>#}
-        {#            <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>#}
-        {#            <input name="content"/>#}
-        {#            <button>Comment</button>#}
-        {#        </form>#}
     </div>
 {% endmacro %}
 
@@ -38,7 +44,9 @@
                 {{ comment.content }}
             </div>
             <div class="actions">
-                <button class="comment-action">Reply</button>
+                <button class="comment-action">
+                    <a href="/reply/{{ post.id }}/{{ comment.id }}">Reply</a>
+                </button>
                 {% if user.owns_comment(comment, post) %}
                     <form method="post" action="/rm-comment" style="display: inline">
                         <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
@@ -54,12 +62,6 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            {#            <form method="post" action="/add-nested-comment" style="display: inline">#}
-            {#                <input type="hidden" name="post_id" value="{{ post.id }}" readonly>#}
-            {#                <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>#}
-            {#                <input name="content"/>#}
-            {#                <button>Comment</button>#}
-            {#            </form>#}
         </div>
     </div>
 {% endmacro %}

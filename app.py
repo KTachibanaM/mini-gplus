@@ -36,7 +36,7 @@ def inject_user():
 user = current_user  # type: User
 
 
-@app.route("/", methods=['GET'])
+@app.route("/")
 def index():
     if not current_user.is_authenticated:
         return render_template('signin.jinja2', form=SigninForm())
@@ -58,7 +58,7 @@ def signin():
     return redirect(url_for('index'))
 
 
-@app.route('/signup', methods=['GET'])
+@app.route('/signup')
 def signup():
     return render_template('signup.jinja2', form=SignupForm())
 
@@ -100,6 +100,12 @@ def rm_post():
     return redirect(url_for('index'))
 
 
+@app.route('/reply/<post_id>/<comment_id>')
+@login_required
+def reply(post_id, comment_id):
+    return render_template('reply.jinja2', post_id=post_id, comment_id=comment_id)
+
+
 @app.route('/add-comment', methods=['POST'])
 @login_required
 def add_comment():
@@ -109,6 +115,7 @@ def add_comment():
 
 
 @app.route('/add-nested-comment', methods=['POST'])
+@login_required
 def add_nested_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
@@ -141,7 +148,7 @@ def users():
         circles=Circle.objects(owner=user.id))
 
 
-@app.route('/circles', methods=['GET'])
+@app.route('/circles')
 @login_required
 def circles():
     form = CreateNewCircleForm()
@@ -177,13 +184,13 @@ def rm_circle():
     return redirect(url_for('circles'))
 
 
-@app.route('/profile', methods=['GET'])
+@app.route('/profile')
 @login_required
 def profile():
     return redirect('/profile/{}'.format(user.user_id))
 
 
-@app.route('/profile/<user_id>', methods=['GET'])
+@app.route('/profile/<user_id>')
 @login_required
 def public_profile(user_id):
     profile_user = User.objects.get(user_id=user_id)

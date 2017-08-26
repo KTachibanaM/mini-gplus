@@ -1,0 +1,17 @@
+{% extends "base/_base.jinja2" %}
+{% block title %}Reply | mini-gplus{% endblock %}
+{% block header %}
+    <a class="item">Reply</a>
+{% endblock %}
+{% block content %}
+    <form class="ui form" method="post" action="/add-nested-comment">
+        <input type="hidden" name="post_id" value="{{ post_id }}" readonly>
+        <input type="hidden" name="comment_id" value="{{ comment_id }}" readonly>
+        <div class="field">
+            <input name="content"/>
+        </div>
+        <div class="field">
+            <button class="ui blue button">Comment</button>
+        </div>
+    </form>
+{% endblock %}
