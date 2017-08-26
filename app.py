@@ -5,7 +5,6 @@ from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
 from models import User, Circle, Post, Comment
 from utils import flash_error
 from os import urandom
-from bson.objectid import ObjectId
 import os
 from pymongo.uri_parser import parse_uri
 
@@ -41,9 +40,7 @@ def index():
             lambda circle: (circle.id, circle.name),
             Circle.objects(owner=current_user.id)
         )
-        posts = filter(lambda post: post.shared_with(current_user), Post.objects())
-        posts = list(reversed(sorted(posts, key=lambda post: post.created_at)))
-        return render_template('index.jinja2', form=create_new_post_form, posts=posts)
+        return render_template('index.jinja2', form=create_new_post_form, posts=user.sees_posts())
 
 
 @app.route('/signin', methods=['POST'])
@@ -111,7 +108,7 @@ def rm_post():
 @login_required
 def add_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
-    if post.shared_with(current_user):
+    if user.sees_post(post):
         user.create_comment(request.form.get('content'), post)
     return redirect(url_for('index'))
 
@@ -193,9 +190,8 @@ def profile():
 @app.route('/profile/<public_id>', methods=['GET'])
 @login_required
 def public_profile(public_id):
-    posts = filter(lambda post: post.shared_with(current_user), Post.objects(author=ObjectId(public_id)))
-    posts = list(reversed(sorted(posts, key=lambda post: post.created_at)))
-    return render_template('profile.jinja2', user_id=User.objects.get(id=public_id).user_id, posts=posts)
+    profile_user = User.objects.get(user_id=public_id)
+    return render_template('profile.jinja2', user_id=User.objects.get(id=public_id).user_id, posts=user.sees_posts(profile_user))
 
 if __name__ == '__main__':
     app.run()

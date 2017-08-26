@@ -103,6 +103,19 @@ class User(Document, UserMixin):
                     return True
         return False
 
+    def sees_posts(self, by_user=None):
+        """
+        All posts that are visible to the user
+        :param (User) by_user: posts that are authored by this user
+        :return (list[Post]): all posts that are visible to the user, reverse chronologically ordered
+        """
+        if by_user is None:
+            posts = Post.objects()
+        else:
+            posts = Post.objects(author=by_user)
+        posts = filter(lambda post: self.sees_post(post), posts)
+        return list(reversed(sorted(posts, key=lambda post: post.created_at)))
+
     def owns_comment(self, comment, parent_post):
         """
         Whether the user owns a comment
@@ -165,9 +178,6 @@ class Comment(Document, CreatedAtMixin):
     author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
     content = StringField(required=True)
 
-    def owned_by(self, current_user, post):
-        return self.author.id == current_user.id or post.owned_by(current_user)
-
 
 class Post(Document, CreatedAtMixin):
     author = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
@@ -175,20 +185,6 @@ class Post(Document, CreatedAtMixin):
     is_public = BooleanField(required=True)
     circles = ListField(ReferenceField(Circle, reverse_delete_rule=PULL), default=[])  # type: list[Circle]
     comments = ListField(ReferenceField(Comment, reverse_delete_rule=PULL), default=[])  # type: list[Comment]
-
-    def shared_with(self, current_user):
-        if self.author.id == current_user.id:
-            return True
-        elif self.is_public:
-            return True
-        else:
-            for circle in self.circles:
-                if circle.check_member(current_user):
-                    return True
-        return False
-
-    def owned_by(self, current_user):
-        return self.author.id == current_user.id
 
     @property
     def sharing_scope_str(self):
