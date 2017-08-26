@@ -28,6 +28,8 @@ app.session_interface = MongoEngineSessionInterface(db)
 def load_user(loaded_id):
     return User.objects.get(id=loaded_id)
 
+user = current_user  # type: User
+
 
 @app.route("/", methods=['GET'])
 def index():
@@ -85,7 +87,6 @@ def add_post():
         Circle.objects(owner=current_user.id)
     )
     if create_new_post_form.validate():
-        user = current_user  # type: User
         user.create_post(
             create_new_post_form.content.data,
             create_new_post_form.is_public.data,
@@ -111,7 +112,6 @@ def rm_post():
 def add_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     if post.shared_with(current_user):
-        user = current_user  # type: User
         user.create_comment(request.form.get('content'), post)
     return redirect(url_for('index'))
 
@@ -121,7 +121,7 @@ def add_comment():
 def rm_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
-    if comment.owned_by(current_user, post):
+    if user.owns_comment(comment, post):
         post.comments.remove(comment)
         comment.delete()
     return redirect(url_for('index'))

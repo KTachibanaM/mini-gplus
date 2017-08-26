@@ -79,6 +79,39 @@ class User(Document, UserMixin):
         parent_post.comments.append(new_comment)
         parent_post.save()
 
+    def owns_post(self, post):
+        """
+        Whether the user owns a post
+        :param (Post) post: the post
+        :return (bool): whether the user owns the post
+        """
+        return self.id == post.author.id
+
+    def sees_post(self, post):
+        """
+        Whether the user can see a post
+        :param (Post) post: the post
+        :return (bool): whether the user sees the post
+        """
+        if self.owns_post(post):
+            return True
+        elif post.is_public:
+            return True
+        else:
+            for circle in post.circles:
+                if circle.check_member(self):
+                    return True
+        return False
+
+    def owns_comment(self, comment, parent_post):
+        """
+        Whether the user owns a comment
+        :param (Comment) comment: the comment
+        :param (Post) parent_post: its parent post
+        :return (bool): whether hte user owns a comment
+        """
+        return self.owns_post(parent_post) or self.id == comment.author.id
+
 
 class Circle(Document):
     owner = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
