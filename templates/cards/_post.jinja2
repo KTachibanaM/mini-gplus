@@ -20,8 +20,11 @@
                     {{ post.content }}
                 </div>
                 <div class="actions">
+                    <button class="comment-action">
+                        <a href="/reply/{{ post.id }}">Comment</a>
+                    </button>
                     {% if user.owns_post(post) %}
-                        <form method="post" action="/rm-post">
+                        <form method="post" action="/rm-post" style="display: inline;">
                             <input type="hidden" name="id" value="{{ post.id }}" readonly>
                             <button class="comment-action">Delete</button>
                         </form>
