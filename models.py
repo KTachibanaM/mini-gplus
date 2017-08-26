@@ -71,13 +71,18 @@ class User(Document, UserMixin):
         Create a comment for the user
         :param (str) content: the content
         :param (Post) parent_post: the post that this comment is attached to
+        :return (bool): whether it's authorized
         """
-        new_comment = Comment()
-        new_comment.author = self.id
-        new_comment.content = content
-        new_comment.save()
-        parent_post.comments.append(new_comment)
-        parent_post.save()
+        if self.sees_post(parent_post):
+            new_comment = Comment()
+            new_comment.author = self.id
+            new_comment.content = content
+            new_comment.save()
+            parent_post.comments.append(new_comment)
+            parent_post.save()
+            return True
+        else:
+            return False
 
     def owns_post(self, post):
         """
@@ -103,6 +108,18 @@ class User(Document, UserMixin):
                     return True
         return False
 
+    def delete_post(self, post):
+        """
+        Delete a post
+        :param (Post) post: the post
+        :return (bool): whether it's authorized
+        """
+        if post.author.id == self.id:
+            post.delete()
+            return True
+        else:
+            return False
+
     def sees_posts(self, by_user=None):
         """
         All posts that are visible to the user
@@ -124,6 +141,20 @@ class User(Document, UserMixin):
         :return (bool): whether hte user owns a comment
         """
         return self.owns_post(parent_post) or self.id == comment.author.id
+
+    def delete_comment(self, comment, parent_post):
+        """
+        Delete a comment
+        :param (Comment) comment: the comment
+        :param (Post) parent_post: comment's parent post
+        :return: whether it's authorized
+        """
+        if self.owns_comment(comment, parent_post):
+            parent_post.comments.remove(comment)
+            comment.delete()
+            return True
+        else:
+            return False
 
 
 class Circle(Document):

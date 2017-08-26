@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, abort
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
@@ -68,6 +68,11 @@ def add_user():
     return redirect(url_for('signup'))
 
 
+@app.errorhandler(401)
+def not_authorized(error):
+    return 'Not authorized'
+
+
 @app.route('/add-post', methods=['POST'])
 @login_required
 def add_post():
@@ -76,8 +81,7 @@ def add_post():
         user.create_post(
             create_new_post_form.content.data,
             create_new_post_form.is_public.data,
-            create_new_post_form.circles.data
-        )
+            create_new_post_form.circles.data)
     create_new_post_form.flash_all_errors()
     return redirect(url_for('index'))
 
@@ -86,18 +90,18 @@ def add_post():
 @login_required
 def rm_post():
     post = Post.objects.get(id=request.form.get('id'))
-    if post.author.id == user.id:
-        post.delete()
-    return redirect(url_for('index'))
+    if user.delete_post(post):
+        return redirect(url_for('index'))
+    abort(401)
 
 
 @app.route('/add-comment', methods=['POST'])
 @login_required
 def add_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
-    if user.sees_post(post):
-        user.create_comment(request.form.get('content'), post)
-    return redirect(url_for('index'))
+    if user.create_comment(request.form.get('content'), post):
+        return redirect(url_for('index'))
+    abort(401)
 
 
 @app.route('/rm-comment', methods=['POST'])
@@ -105,10 +109,9 @@ def add_comment():
 def rm_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
-    if user.owns_comment(comment, post):
-        post.comments.remove(comment)
-        comment.delete()
-    return redirect(url_for('index'))
+    if user.delete_comment(comment, post):
+        return redirect(url_for('index'))
+    abort(401)
 
 
 @app.route('/signout')
@@ -124,8 +127,7 @@ def users():
     return render_template(
         'users.jinja2',
         users=User.objects(id__ne=user.id),
-        circles=Circle.objects(owner=user.id)
-    )
+        circles=Circle.objects(owner=user.id))
 
 
 @app.route('/circles', methods=['GET'])
