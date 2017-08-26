@@ -48,9 +48,7 @@ def signin():
             login_user(found_user, remember=True)
         else:
             flash_error('Wrong id or password')
-    else:
-        for error in signin_form.all_errors_str:
-            flash_error(error)
+    signin_form.flash_all_errors()
     return redirect(url_for('index'))
 
 
@@ -66,8 +64,7 @@ def add_user():
         if User.create(signup_form.id.data, signup_form.password.data):
             return redirect(url_for('index'))
         flash_error('id {} is already taken'.format(signup_form.id.data))
-    for error in signup_form.all_errors_str:
-        flash_error(error)
+    signup_form.flash_all_errors()
     return redirect(url_for('signup'))
 
 
@@ -81,9 +78,7 @@ def add_post():
             create_new_post_form.is_public.data,
             create_new_post_form.circles.data
         )
-    else:
-        for error in create_new_post_form.all_errors_str:
-            flash_error(error)
+    create_new_post_form.flash_all_errors()
     return redirect(url_for('index'))
 
 
@@ -143,14 +138,12 @@ def circles():
 @app.route('/add-circle', methods=['POST'])
 @login_required
 def add_circle():
-    form = CreateNewCircleForm(request.form)
-    if form.validate():
-        new_circle_name = form.name.data
+    create_new_circle_form = CreateNewCircleForm(request.form)
+    if create_new_circle_form.validate():
+        new_circle_name = create_new_circle_form.name.data
         if not Circle.create(current_user, new_circle_name):
             flash_error('{} already exists'.format(new_circle_name))
-    else:
-        for error in form.all_errors_str:
-            flash_error(error)
+    create_new_circle_form.flash_all_errors()
     return redirect(url_for('circles'))
 
 
