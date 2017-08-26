@@ -1,6 +1,8 @@
+from utils import flash_error
 from wtforms import Form, StringField, BooleanField, PasswordField, TextAreaField, validators, SelectMultipleField
 from utils import DataRequiredIf
 from bson.objectid import ObjectId
+from models import Circle
 
 
 class AllErrorsStrMixin(object):
@@ -11,7 +13,13 @@ class AllErrorsStrMixin(object):
                 yield "{}: {}".format(field, error)
 
 
-class SignupForm(Form, AllErrorsStrMixin):
+class FlashAllErrorsMixin(AllErrorsStrMixin):
+    def flash_all_errors(self):
+        for error in self.all_errors_str:
+            flash_error(error)
+
+
+class SignupForm(Form, FlashAllErrorsMixin):
     id = StringField('ID', [
         validators.DataRequired(),
         validators.Length(min=2, max=256)
@@ -23,7 +31,7 @@ class SignupForm(Form, AllErrorsStrMixin):
     confirm_password = PasswordField('Confirm Password')
 
 
-class SigninForm(Form, AllErrorsStrMixin):
+class SigninForm(Form, FlashAllErrorsMixin):
     id = StringField('ID', [
         validators.DataRequired()
     ])
@@ -32,13 +40,13 @@ class SigninForm(Form, AllErrorsStrMixin):
     ])
 
 
-class CreateNewCircleForm(Form, AllErrorsStrMixin):
+class CreateNewCircleForm(Form, FlashAllErrorsMixin):
     name = StringField('Name', [
         validators.DataRequired()
     ])
 
 
-class CreateNewPostForm(Form, AllErrorsStrMixin):
+class CreateNewPostForm(Form, FlashAllErrorsMixin):
     content = TextAreaField('Content', [
         validators.DataRequired()
     ])
@@ -46,3 +54,15 @@ class CreateNewPostForm(Form, AllErrorsStrMixin):
     circles = SelectMultipleField('Circles', [
         DataRequiredIf(is_public=False)
     ], ObjectId)
+
+    def __init__(self, circles, *args, **kwargs):
+        """
+        :param (list[Circle]) circles: circles
+        :param args:
+        :param kwargs:
+        """
+        super(CreateNewPostForm, self).__init__(*args, **kwargs)
+        self.circles.choices = map(
+            lambda circle: (circle.id, circle.name),
+            circles
+        )

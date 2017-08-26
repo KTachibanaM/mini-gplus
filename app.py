@@ -1,12 +1,10 @@
 from flask import Flask, request, render_template, redirect, url_for, abort
-from mongoengine import NotUniqueError
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
 from models import User, Circle, Post, Comment
 from utils import flash_error
 from os import urandom
-from bson.objectid import ObjectId
 import os
 from pymongo.uri_parser import parse_uri
 
@@ -29,20 +27,16 @@ app.session_interface = MongoEngineSessionInterface(db)
 def load_user(loaded_id):
     return User.objects.get(id=loaded_id)
 
+user = current_user  # type: User
+
 
 @app.route("/", methods=['GET'])
 def index():
     if not current_user.is_authenticated:
         return render_template('signin.jinja2', form=SigninForm())
     else:
-        create_new_post_form = CreateNewPostForm()
-        create_new_post_form.circles.choices = map(
-            lambda circle: (circle.id, circle.name),
-            Circle.objects(owner=current_user.id)
-        )
-        posts = filter(lambda post: post.shared_with(current_user), Post.objects())
-        posts = list(reversed(sorted(posts, key=lambda post: post.created_at)))
-        return render_template('index.jinja2', form=create_new_post_form, posts=posts)
+        create_new_post_form = CreateNewPostForm(Circle.objects(owner=user.id))
+        return render_template('index.jinja2', form=create_new_post_form, posts=user.sees_posts())
 
 
 @app.route('/signin', methods=['POST'])
@@ -54,9 +48,7 @@ def signin():
             login_user(found_user, remember=True)
         else:
             flash_error('Wrong id or password')
-    else:
-        for error in signin_form.all_errors_str:
-            flash_error(error)
+    signin_form.flash_all_errors()
     return redirect(url_for('index'))
 
 
@@ -72,29 +64,25 @@ def add_user():
         if User.create(signup_form.id.data, signup_form.password.data):
             return redirect(url_for('index'))
         flash_error('id {} is already taken'.format(signup_form.id.data))
-    for error in signup_form.all_errors_str:
-        flash_error(error)
+    signup_form.flash_all_errors()
     return redirect(url_for('signup'))
+
+
+@app.errorhandler(401)
+def not_authorized(error):
+    return 'Not authorized'
 
 
 @app.route('/add-post', methods=['POST'])
 @login_required
 def add_post():
-    create_new_post_form = CreateNewPostForm(request.form)
-    create_new_post_form.circles.choices = map(
-        lambda circle: (circle.id, circle.name),
-        Circle.objects(owner=current_user.id)
-    )
+    create_new_post_form = CreateNewPostForm(Circle.objects(owner=user.id), request.form)
     if create_new_post_form.validate():
-        new_post = Post()
-        new_post.author = current_user.id
-        new_post.content = create_new_post_form.content.data
-        new_post.is_public = create_new_post_form.is_public.data
-        new_post.circles = create_new_post_form.circles.data
-        new_post.save()
-    else:
-        for error in create_new_post_form.all_errors_str:
-            flash_error(error)
+        user.create_post(
+            create_new_post_form.content.data,
+            create_new_post_form.is_public.data,
+            create_new_post_form.circles.data)
+    create_new_post_form.flash_all_errors()
     return redirect(url_for('index'))
 
 
@@ -102,23 +90,18 @@ def add_post():
 @login_required
 def rm_post():
     post = Post.objects.get(id=request.form.get('id'))
-    if post.author.id == current_user.id:
-        post.delete()
-    return redirect(url_for('index'))
+    if user.delete_post(post):
+        return redirect(url_for('index'))
+    abort(401)
 
 
 @app.route('/add-comment', methods=['POST'])
 @login_required
 def add_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
-    if post.shared_with(current_user):
-        new_comment = Comment()
-        new_comment.author = current_user.id
-        new_comment.content = request.form.get('content')
-        new_comment.save()
-        post.comments.append(new_comment)
-        post.save()
-    return redirect(url_for('index'))
+    if user.create_comment(request.form.get('content'), post):
+        return redirect(url_for('index'))
+    abort(401)
 
 
 @app.route('/rm-comment', methods=['POST'])
@@ -126,10 +109,9 @@ def add_comment():
 def rm_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
-    if comment.owned_by(current_user, post):
-        post.comments.remove(comment)
-        comment.delete()
-    return redirect(url_for('index'))
+    if user.delete_comment(comment, post):
+        return redirect(url_for('index'))
+    abort(401)
 
 
 @app.route('/signout')
@@ -144,29 +126,26 @@ def signout():
 def users():
     return render_template(
         'users.jinja2',
-        users=User.objects(id__ne=current_user.id),
-        circles=Circle.objects(owner=current_user.id)
-    )
+        users=User.objects(id__ne=user.id),
+        circles=Circle.objects(owner=user.id))
 
 
 @app.route('/circles', methods=['GET'])
 @login_required
 def circles():
     form = CreateNewCircleForm()
-    return render_template('circles.jinja2', form=form, circles=Circle.objects(owner=current_user.id))
+    return render_template('circles.jinja2', form=form, circles=Circle.objects(owner=user.id))
 
 
 @app.route('/add-circle', methods=['POST'])
 @login_required
 def add_circle():
-    form = CreateNewCircleForm(request.form)
-    if form.validate():
-        new_circle_name = form.name.data
-        if not Circle.create(current_user, new_circle_name):
+    create_new_circle_form = CreateNewCircleForm(request.form)
+    if create_new_circle_form.validate():
+        new_circle_name = create_new_circle_form.name.data
+        if not user.create_circle(new_circle_name):
             flash_error('{} already exists'.format(new_circle_name))
-    else:
-        for error in form.all_errors_str:
-            flash_error(error)
+    create_new_circle_form.flash_all_errors()
     return redirect(url_for('circles'))
 
 
@@ -174,38 +153,32 @@ def add_circle():
 @login_required
 def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
-    if circle.owner.id == current_user.id:
-        toggled_user = User.objects.get(id=request.form.get('user_id'))
-        if circle.check_member(toggled_user):
-            circle.members.remove(toggled_user)
-        else:
-            circle.members.append(toggled_user)
-        circle.save()
-    return redirect(url_for('users'))
+    toggled_user = User.objects.get(id=request.form.get('user_id'))
+    if user.toggle_member(circle, toggled_user):
+        return redirect(url_for('users'))
+    abort(401)
 
 
 @app.route('/rm-circle', methods=['POST'])
 @login_required
 def rm_circle():
     circle = Circle.objects.get(id=request.form.get('id'))
-    if circle.owner.id == current_user.id:
-        circle.delete()
-    return redirect(url_for('circles'))
+    if user.delete_circle(circle):
+        return redirect(url_for('circles'))
+    abort(401)
 
 
 @app.route('/profile', methods=['GET'])
 @login_required
 def profile():
-    posts = list(reversed(sorted(Post.objects(author=current_user.id), key=lambda post: post.created_at)))
-    return render_template('profile.jinja2', user_id=current_user.user_id, posts=posts)
+    return redirect('/profile/{}'.format(user.user_id))
 
 
-@app.route('/profile/<public_id>', methods=['GET'])
+@app.route('/profile/<user_id>', methods=['GET'])
 @login_required
-def public_profile(public_id):
-    posts = filter(lambda post: post.shared_with(current_user), Post.objects(author=ObjectId(public_id)))
-    posts = list(reversed(sorted(posts, key=lambda post: post.created_at)))
-    return render_template('profile.jinja2', user_id=User.objects.get(id=public_id).user_id, posts=posts)
+def public_profile(user_id):
+    profile_user = User.objects.get(user_id=user_id)
+    return render_template('profile.jinja2', user_id=user_id, posts=user.sees_posts(profile_user))
 
 if __name__ == '__main__':
     app.run()
