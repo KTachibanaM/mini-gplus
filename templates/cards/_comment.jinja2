@@ -38,11 +38,12 @@
                 {{ comment.content }}
             </div>
             <div class="actions">
+                <button class="comment-action">Reply</button>
                 {% if current_user.owns_comment(comment, post) %}
                     <form method="post" action="/rm-comment" style="display: inline">
                         <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
                         <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
-                        <button class="comment_action">Delete</button>
+                        <button class="comment-action">Delete</button>
                     </form>
                 {% endif %}
             </div>
