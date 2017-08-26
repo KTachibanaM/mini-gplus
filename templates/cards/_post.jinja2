@@ -27,7 +27,7 @@
         </div>
         {% if post.comments %}
             <div class="content">
-                <div class="ui comments">
+                <div class="ui threaded comments">
                     {% for comment in post.comments %}
                         {{ render_comment(comment, post, current_user) }}
                     {% endfor %}
