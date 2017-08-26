@@ -163,9 +163,9 @@ def toggle_member():
 @login_required
 def rm_circle():
     circle = Circle.objects.get(id=request.form.get('id'))
-    if circle.owner.id == user.id:
-        circle.delete()
-    return redirect(url_for('circles'))
+    if user.delete_circle(circle):
+        return redirect(url_for('circles'))
+    abort(401)
 
 
 @app.route('/profile', methods=['GET'])

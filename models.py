@@ -197,6 +197,18 @@ class User(Document, UserMixin):
         else:
             return False
 
+    def delete_circle(self, circle):
+        """
+        Delete a circle
+        :param (Circle) circle: the circle
+        :return (bool): whether it's authorized
+        """
+        if circle.owner.id == self.id:
+            circle.delete()
+            return True
+        else:
+            return False
+
 
 class Circle(Document):
     owner = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)  # type: User
