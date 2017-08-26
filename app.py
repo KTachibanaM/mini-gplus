@@ -102,6 +102,7 @@ def rm_post():
 
 @app.route('/reply/<post_id>/<comment_id>')
 @login_required
+# TODO: authorized?
 def reply(post_id, comment_id):
     return render_template('reply.jinja2', post_id=post_id, comment_id=comment_id)
 
@@ -129,6 +130,16 @@ def rm_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
     user.delete_comment(comment, post)
+    return redirect(url_for('index'))
+
+
+@app.route('/rm-nested-comment', methods=['POST'])
+@login_required
+def rm_nested_comment():
+    post = Post.objects.get(id=request.form.get('post_id'))
+    parent_comment = Comment.objects.get(id=request.form.get('parent_comment_id'))
+    comment = Comment.objects.get(id=request.form.get('comment_id'))
+    user.delete_nested_comment(comment, parent_comment, post)
     return redirect(url_for('index'))
 
 
