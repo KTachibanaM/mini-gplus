@@ -9,7 +9,7 @@
                     </button>
                 </form>
             {% endif %}
-            <a class="author" href="/profile/{{ post.author.id }}">
+            <a class="author" href="/profile/{{ post.author.user_id }}">
                 {{ post.author.user_id }}
             </a>
             <div class="meta">
@@ -33,7 +33,7 @@
                     {% for comment in post.comments %}
                         <div class="ui comment">
                             <div class="content">
-                                <a class="author" href="/profile/{{ comment.author.id }}">
+                                <a class="author" href="/profile/{{ comment.author.user_id }}">
                                     {{ comment.author.user_id }}
                                 </a>
                                 <div class="metadata">

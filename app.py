@@ -183,15 +183,14 @@ def rm_circle():
 @app.route('/profile', methods=['GET'])
 @login_required
 def profile():
-    posts = list(reversed(sorted(Post.objects(author=current_user.id), key=lambda post: post.created_at)))
-    return render_template('profile.jinja2', user_id=current_user.user_id, posts=posts)
+    return redirect('/profile/{}'.format(user.user_id))
 
 
-@app.route('/profile/<public_id>', methods=['GET'])
+@app.route('/profile/<user_id>', methods=['GET'])
 @login_required
-def public_profile(public_id):
-    profile_user = User.objects.get(user_id=public_id)
-    return render_template('profile.jinja2', user_id=User.objects.get(id=public_id).user_id, posts=user.sees_posts(profile_user))
+def public_profile(user_id):
+    profile_user = User.objects.get(user_id=user_id)
+    return render_template('profile.jinja2', user_id=user_id, posts=user.sees_posts(profile_user))
 
 if __name__ == '__main__':
     app.run()
