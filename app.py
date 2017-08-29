@@ -6,6 +6,7 @@ from models import User, Circle, Post, Comment
 from utils import flash_error
 from os import urandom
 import os
+import sys
 from pymongo.uri_parser import parse_uri
 from custom_exceptions import UnauthorizedAccess
 
@@ -209,4 +210,7 @@ def public_profile(user_id):
     return render_template('profile.jinja2', profile_user=profile_user, posts=user.sees_posts(profile_user))
 
 if __name__ == '__main__':
-    app.run()
+    if len(sys.argv) == 2 and sys.argv[1] == 'c9':
+        app.run(host='0.0.0.0', port=8080)
+    else:
+        app.run()
