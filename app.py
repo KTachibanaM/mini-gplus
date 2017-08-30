@@ -90,7 +90,7 @@ def add_post():
             create_new_post_form.is_public.data,
             create_new_post_form.circles.data)
     create_new_post_form.flash_all_errors()
-    return redirect_back(request)
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/rm-post', methods=['POST'])
@@ -98,7 +98,7 @@ def add_post():
 def rm_post():
     post = Post.objects.get(id=request.form.get('id'))
     user.delete_post(post)
-    return redirect_back(request)
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/reply/<post_id>')
@@ -106,7 +106,7 @@ def rm_post():
 @login_required
 # TODO: authorized?
 def reply(post_id, comment_id=None):
-    return render_template('reply.jinja2', post_id=post_id, comment_id=comment_id, next=request.args.get('next', '/'))
+    return render_template('reply.jinja2', post_id=post_id, comment_id=comment_id, next=request.args.get('next', url_for('index')))
 
 
 @app.route('/add-comment', methods=['POST'])
@@ -114,7 +114,7 @@ def reply(post_id, comment_id=None):
 def add_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     user.create_comment(request.form.get('content'), post)
-    return redirect_back(request)
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/add-nested-comment', methods=['POST'])
@@ -123,7 +123,7 @@ def add_nested_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
     user.create_nested_comment(request.form.get('content'), comment, post)
-    return redirect_back(request)
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/rm-comment', methods=['POST'])
@@ -132,7 +132,7 @@ def rm_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
     user.delete_comment(comment, post)
-    return redirect_back(request)
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/rm-nested-comment', methods=['POST'])
@@ -142,7 +142,7 @@ def rm_nested_comment():
     parent_comment = Comment.objects.get(id=request.form.get('parent_comment_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
     user.delete_nested_comment(comment, parent_comment, post)
-    return redirect_back(request)
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/signout')
@@ -177,7 +177,7 @@ def add_circle():
         if not user.create_circle(new_circle_name):
             flash_error('{} already exists'.format(new_circle_name))
     create_new_circle_form.flash_all_errors()
-    return redirect_back(request)
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/toggle-member', methods=['POST'])
@@ -186,7 +186,7 @@ def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
     toggled_user = User.objects.get(id=request.form.get('user_id'))
     user.toggle_member(circle, toggled_user)
-    return redirect_back(request)
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/rm-circle', methods=['POST'])
@@ -194,13 +194,13 @@ def toggle_member():
 def rm_circle():
     circle = Circle.objects.get(id=request.form.get('id'))
     user.delete_circle(circle)
-    return redirect_back(request)
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/profile')
 @login_required
 def profile():
-    return redirect('/profile/{}'.format(user.user_id))
+    return redirect(url_for('public_profile', user_id=user.user_id))
 
 
 @app.route('/profile/<user_id>')

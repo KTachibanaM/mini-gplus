@@ -22,7 +22,7 @@ def _get_redirect_target(request):
     return None
 
 
-def redirect_back(request, default_target='/'):
+def redirect_back(request, default_target):
     redirect_target = _get_redirect_target(request)
     if not redirect_target:
         return redirect(default_target)
