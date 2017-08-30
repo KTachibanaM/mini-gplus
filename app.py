@@ -106,7 +106,7 @@ def rm_post():
 @login_required
 # TODO: authorized?
 def reply(post_id, comment_id=None):
-    return render_template('reply.jinja2', post_id=post_id, comment_id=comment_id)
+    return render_template('reply.jinja2', post_id=post_id, comment_id=comment_id, next=request.args.get('next', '/'))
 
 
 @app.route('/add-comment', methods=['POST'])

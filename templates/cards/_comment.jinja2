@@ -11,7 +11,7 @@
         </div>
         <div class="actions">
             <button class="comment-action">
-                <a href="/reply/{{ post.id }}/{{ comment.id }}">Reply</a>
+                <a href="/reply/{{ post.id }}/{{ comment.id }}?next={{ request.path }}">Reply</a>
             </button>
             {% if user.owns_nested_comment(comment, parent_comment, post) %}
                 <form method="post" action="/rm-nested-comment" style="display: inline">
@@ -46,7 +46,7 @@
             </div>
             <div class="actions">
                 <button class="comment-action">
-                    <a href="/reply/{{ post.id }}/{{ comment.id }}">Reply</a>
+                    <a href="/reply/{{ post.id }}/{{ comment.id }}?next={{ request.path }}">Reply</a>
                 </button>
                 {% if user.owns_comment(comment, post) %}
                     <form method="post" action="/rm-comment" style="display: inline">

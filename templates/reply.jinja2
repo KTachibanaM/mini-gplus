@@ -4,9 +4,9 @@
     <div class="ui fluid raised card">
         <div class="content">
             {% if not comment_id %}
-                <form class="ui form" method="post" action="/add-comment">
+                <form class="ui form" method="post" action="/add-comment?next={{ next }}">
             {% else %}
-                <form class="ui form" method="post" action="/add-nested-comment">
+                <form class="ui form" method="post" action="/add-nested-comment?next={{ next }}">
             {% endif %}
             <input type="hidden" name="post_id" value="{{ post_id }}" readonly>
             <input type="hidden" name="comment_id" value="{{ comment_id }}" readonly>
@@ -15,7 +15,7 @@
             </div>
             <div class="fields">
                 <div class="field">
-                    <a href="/" class="ui button">Discard</a>
+                    <a href="{{ next }}" class="ui button">Discard</a>
                 </div>
                 <div class="field">
                     <button class="ui blue button">Reply</button>

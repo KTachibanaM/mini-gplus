@@ -21,7 +21,7 @@
                 </div>
                 <div class="actions">
                     <button class="comment-action">
-                        <a href="/reply/{{ post.id }}">Reply</a>
+                        <a href="/reply/{{ post.id }}?next={{ request.path }}">Reply</a>
                     </button>
                     {% if user.owns_post(post) %}
                         <form method="post" action="/rm-post" style="display: inline;">
