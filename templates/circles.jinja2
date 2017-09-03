@@ -7,7 +7,7 @@
             <p>Create new circle</p>
         </div>
         <div class="content">
-            <form class="ui error form" method='post' action="/add-circle">
+            <form class="ui error form" method='post' action={{ url_for("add_circle") }}>
                 <div class="fields">
                     <div class="twelve wide field">
                         {{ render_field(form.name, this_wants_label=False) }}
@@ -22,7 +22,7 @@
     </div>
     {% if circles %}
         {% for circle in circles %}
-            <form class="ui form" method="post" action="/rm-circle" style="display: inline">
+            <form class="ui form" method="post" action={{ url_for("rm_circle") }} style="display: inline">
                 <input type="hidden" name="id" value="{{ circle.id }}" readonly>
                 <div class="ui raised fluid card">
                     <div class="content">
@@ -34,7 +34,7 @@
                     <div class="content">
                         <div class="ui relaxed list">
                             {% for member in circle.members %}
-                                <a class="item" href="/profile/{{ member.user_id }}">{{ member.user_id }}</a>
+                                <a class="item" href={{ url_for("public_profile", user_id=member.user_id) }}>{{ member.user_id }}</a>
                             {% endfor %}
                         </div>
                     </div>

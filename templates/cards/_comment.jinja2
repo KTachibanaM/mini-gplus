@@ -1,6 +1,6 @@
 {% macro render_nested_comment(comment, parent_comment, post) %}
     <div class="comment">
-        <a class="author" href="/profile/{{ comment.author.user_id }}">
+        <a class="author" href={{ url_for('public_profile', user_id=comment.author.user_id) }}>
             {{ comment.author.user_id }}
         </a>
         <div class="metadata">
@@ -11,10 +11,10 @@
         </div>
         <div class="actions">
             <button class="comment-action">
-                <a href="/reply/{{ post.id }}/{{ comment.id }}?next={{ request.path }}">Reply</a>
+                <a href={{ url_for('reply', post_id=post.id, comment_id=comment.id, next=request.path) }}>Reply</a>
             </button>
             {% if user.owns_nested_comment(comment, parent_comment, post) %}
-                <form method="post" action="/rm-nested-comment" style="display: inline">
+                <form method="post" action={{ url_for('rm_nested_comment') }} style="display: inline">
                     <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
                     <input type="hidden" name="parent_comment_id" value="{{ parent_comment.id }}" readonly>
                     <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
@@ -35,7 +35,7 @@
 {% macro render_comment(comment, post) %}
     <div class="comment">
         <div class="content">
-            <a class="author" href="/profile/{{ comment.author.user_id }}">
+            <a class="author" href={{ url_for("public_profile", user_id=comment.author.user_id) }}>
                 {{ comment.author.user_id }}
             </a>
             <div class="metadata">
@@ -46,10 +46,10 @@
             </div>
             <div class="actions">
                 <button class="comment-action">
-                    <a href="/reply/{{ post.id }}/{{ comment.id }}?next={{ request.path }}">Reply</a>
+                    <a href={{ url_for("reply", post_id=post.id, comment_id=comment.id, next=request.path) }}>Reply</a>
                 </button>
                 {% if user.owns_comment(comment, post) %}
-                    <form method="post" action="/rm-comment" style="display: inline">
+                    <form method="post" action={{ url_for("rm_comment") }} style="display: inline">
                         <input type="hidden" name="comment_id" value="{{ comment.id }}" readonly>
                         <input type="hidden" name="post_id" value="{{ post.id }}" readonly>
                         <button class="comment-action">Delete</button>

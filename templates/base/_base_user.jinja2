@@ -5,7 +5,7 @@
     <a class="item" href={{ url_for('circles') }}>Circles</a>
     <a class="item" href={{ url_for('users') }}>Users</a>
     <div class="right menu">
-        <a class="item" href={{ url_for('profile') }}>Hi {{ user.user_id }}</a>
+        <a class="item" href={{ url_for('public_profile', user_id=user.user_id) }}>Hi {{ user.user_id }}</a>
         <a class="item" href={{ url_for('signout') }}>Sign out</a>
     </div>
 {% endblock %}

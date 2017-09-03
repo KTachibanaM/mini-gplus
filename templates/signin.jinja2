@@ -2,7 +2,7 @@
 {% from "_form.jinja2" import render_field, render_flashed_errors %}
 {% block title %}Sign in | mini-gplus{% endblock %}
 {% block content %}
-    <form action="/signin" class="ui form error" method='post'>
+    <form action={{ url_for("signin") }} class="ui form error" method='post'>
         <div class="field">
             {{ render_field(form.id) }}
         </div>

@@ -37,7 +37,7 @@ def inject_user():
 user = current_user  # type: User
 
 
-@app.route("/")
+@app.route('/')
 def index():
     if not current_user.is_authenticated:
         return render_template('signin.jinja2', form=SigninForm())
@@ -195,12 +195,6 @@ def rm_circle():
     circle = Circle.objects.get(id=request.form.get('id'))
     user.delete_circle(circle)
     return redirect_back(request, url_for('index'))
-
-
-@app.route('/profile')
-@login_required
-def profile():
-    return redirect(url_for('public_profile', user_id=user.user_id))
 
 
 @app.route('/profile/<user_id>')

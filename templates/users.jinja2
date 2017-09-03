@@ -5,14 +5,14 @@
         {% for user in users %}
             <div class="ui fluid raised card">
                 <div class="content">
-                    <a href="/profile/{{ user.user_id }}">
+                    <a href={{ url_for("public_profile", user_id=user.user_id) }}>
                         {{ user.user_id }}
                     </a>
                 </div>
                 {% if circles %}
                     <div class="content">
                         {% for circle in circles %}
-                            <form method="post" action="/toggle-member" style="display: inline">
+                            <form method="post" action={{ url_for("toggle_member") }} style="display: inline">
                                 <input type="hidden" name="user_id" value="{{ user.id }}">
                                 <input type="hidden" name="circle_id" value="{{ circle.id }}">
                                 {% if circle.check_member(user) %}
