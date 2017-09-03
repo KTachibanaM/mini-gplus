@@ -3,7 +3,7 @@ from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
 from models import User, Circle, Post, Comment
-from utils import flash_error
+from utils import flash_error, redirect_back
 from os import urandom
 import os
 import sys
@@ -37,7 +37,7 @@ def inject_user():
 user = current_user  # type: User
 
 
-@app.route("/")
+@app.route('/')
 def index():
     if not current_user.is_authenticated:
         return render_template('signin.jinja2', form=SigninForm())
@@ -90,7 +90,7 @@ def add_post():
             create_new_post_form.is_public.data,
             create_new_post_form.circles.data)
     create_new_post_form.flash_all_errors()
-    return redirect(url_for('index'))
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/rm-post', methods=['POST'])
@@ -98,7 +98,7 @@ def add_post():
 def rm_post():
     post = Post.objects.get(id=request.form.get('id'))
     user.delete_post(post)
-    return redirect(url_for('index'))
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/reply/<post_id>')
@@ -106,7 +106,7 @@ def rm_post():
 @login_required
 # TODO: authorized?
 def reply(post_id, comment_id=None):
-    return render_template('reply.jinja2', post_id=post_id, comment_id=comment_id)
+    return render_template('reply.jinja2', post_id=post_id, comment_id=comment_id, next=request.args.get('next', url_for('index')))
 
 
 @app.route('/add-comment', methods=['POST'])
@@ -114,7 +114,7 @@ def reply(post_id, comment_id=None):
 def add_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     user.create_comment(request.form.get('content'), post)
-    return redirect(url_for('index'))
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/add-nested-comment', methods=['POST'])
@@ -123,7 +123,7 @@ def add_nested_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
     user.create_nested_comment(request.form.get('content'), comment, post)
-    return redirect(url_for('index'))
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/rm-comment', methods=['POST'])
@@ -132,7 +132,7 @@ def rm_comment():
     post = Post.objects.get(id=request.form.get('post_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
     user.delete_comment(comment, post)
-    return redirect(url_for('index'))
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/rm-nested-comment', methods=['POST'])
@@ -142,7 +142,7 @@ def rm_nested_comment():
     parent_comment = Comment.objects.get(id=request.form.get('parent_comment_id'))
     comment = Comment.objects.get(id=request.form.get('comment_id'))
     user.delete_nested_comment(comment, parent_comment, post)
-    return redirect(url_for('index'))
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/signout')
@@ -177,7 +177,7 @@ def add_circle():
         if not user.create_circle(new_circle_name):
             flash_error('{} already exists'.format(new_circle_name))
     create_new_circle_form.flash_all_errors()
-    return redirect(url_for('circles'))
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/toggle-member', methods=['POST'])
@@ -186,7 +186,7 @@ def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
     toggled_user = User.objects.get(id=request.form.get('user_id'))
     user.toggle_member(circle, toggled_user)
-    return redirect(url_for('users'))
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/rm-circle', methods=['POST'])
@@ -194,13 +194,7 @@ def toggle_member():
 def rm_circle():
     circle = Circle.objects.get(id=request.form.get('id'))
     user.delete_circle(circle)
-    return redirect(url_for('circles'))
-
-
-@app.route('/profile')
-@login_required
-def profile():
-    return redirect('/profile/{}'.format(user.user_id))
+    return redirect_back(request, url_for('index'))
 
 
 @app.route('/profile/<user_id>')

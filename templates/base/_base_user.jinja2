@@ -1,12 +1,12 @@
 {% extends "base/_base_header.jinja2" %}
 {% block title %}{% endblock %}
 {% block header %}
-    <a class="item" href="/">Stream</a>
-    <a class="item" href="/circles">Circles</a>
-    <a class="item" href="/users">Users</a>
+    <a class="item" href={{ url_for('index') }}>Stream</a>
+    <a class="item" href={{ url_for('circles') }}>Circles</a>
+    <a class="item" href={{ url_for('users') }}>Users</a>
     <div class="right menu">
-        <a class="item" href="/profile">Hi {{ user.user_id }}</a>
-        <a class="item" href="/signout">Sign out</a>
+        <a class="item" href={{ url_for('public_profile', user_id=user.user_id) }}>Hi {{ user.user_id }}</a>
+        <a class="item" href={{ url_for('signout') }}>Sign out</a>
     </div>
 {% endblock %}
 {% block content %}{% endblock %}

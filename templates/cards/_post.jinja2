@@ -4,7 +4,7 @@
     <div class="ui fluid raised card">
         <div class="ui content comments">
             <div class="comment">
-                <a class="author" href="/profile/{{ post.author.user_id }}">
+                <a class="author" href={{ url_for("public_profile", user_id=post.author.user_id) }}>
                     {{ post.author.user_id }}
                 </a>
                 <div class="metadata">
@@ -21,10 +21,10 @@
                 </div>
                 <div class="actions">
                     <button class="comment-action">
-                        <a href="/reply/{{ post.id }}">Reply</a>
+                        <a href={{ url_for("reply", post_id=post.id, next=request.path) }}>Reply</a>
                     </button>
                     {% if user.owns_post(post) %}
-                        <form method="post" action="/rm-post" style="display: inline;">
+                        <form method="post" action={{ url_for("rm_post") }} style="display: inline;">
                             <input type="hidden" name="id" value="{{ post.id }}" readonly>
                             <button class="comment-action">Delete</button>
                         </form>

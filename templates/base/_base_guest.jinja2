@@ -1,7 +1,7 @@
 {% extends "base/_base_header.jinja2" %}
 {% block title %}{% endblock %}
 {% block header %}
-    <a class="item" href="/">Sign in</a>
-    <a class="item" href="/signup">Sign up</a>
+    <a class="item" href={{ url_for('index') }}>Sign in</a>
+    <a class="item" href={{ url_for('signup') }}>Sign up</a>
 {% endblock %}
 {% block content %}{% endblock %}
