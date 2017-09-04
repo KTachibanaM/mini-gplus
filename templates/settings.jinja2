@@ -1,0 +1,21 @@
+{% extends "base/_base_headerless.jinja2" %}
+{% block title %}Settings | mini-gplus{% endblock %}
+{% block content %}
+    <div class="ui fluid raised card">
+        <div class="content">
+            <form class="ui form" method="post" action={{ url_for("update_avatar", next=url_for('settings')) }}>
+                <div class="field">
+                    <label>User id</label>
+                    <input name="content" value="{{ user.user_id }}" readonly />
+                </div>
+                <div class="field">
+                    <label>Avatar</label>
+                    <input type="file" name="avatar" accept="image/*">
+                </div>
+                <div class="field">
+                    <button class="ui blue button">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

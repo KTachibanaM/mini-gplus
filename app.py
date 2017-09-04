@@ -33,8 +33,7 @@ app.session_interface = MongoEngineSessionInterface(db)
 
 # storage
 app.config.update({
-    "STORAGE_PROVIDER": os.environ.get('STORAGE_PROVIDER', 'LOCAL'),
-    "STORAGE_ALLOWED_EXTENSIONS": ["jpg", "jpeg", "png", "gif"]
+    "STORAGE_PROVIDER": os.environ.get('STORAGE_PROVIDER', 'LOCAL')
 })
 if app.config['STORAGE_PROVIDER'] == 'LOCAL':
     app.config.update({
@@ -220,6 +219,18 @@ def toggle_member():
 def rm_circle():
     circle = Circle.objects.get(id=request.form.get('id'))
     user.delete_circle(circle)
+    return redirect_back(request, url_for('index'))
+
+
+@app.route('/settings')
+@login_required
+def settings():
+    return render_template('settings.jinja2')
+
+
+@app.route('/update-avatar', methods=['POST'])
+@login_required
+def update_avatar():
     return redirect_back(request, url_for('index'))
 
 
