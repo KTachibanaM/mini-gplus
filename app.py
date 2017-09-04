@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
+from flask_cloudy import Storage
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
 from models import User, Circle, Post, Comment
 from utils import flash_error, redirect_back
@@ -11,10 +12,13 @@ from pymongo.uri_parser import parse_uri
 from custom_exceptions import UnauthorizedAccess
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-app.secret_key = urandom(24)
+
+# auth
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.init_app(app)
+
+# db
 mongodb_uri = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017/minigplus')
 mongodb_db = parse_uri(mongodb_uri)['database']
 app.config['MONGODB_SETTINGS'] = {
@@ -22,7 +26,29 @@ app.config['MONGODB_SETTINGS'] = {
     'host': mongodb_uri
 }
 db = MongoEngine(app)
+
+# session
+app.secret_key = urandom(24)
 app.session_interface = MongoEngineSessionInterface(db)
+
+# storage
+app.config.update({
+    "STORAGE_PROVIDER": os.environ.get('STORAGE_PROVIDER', 'LOCAL'),
+    "STORAGE_ALLOWED_EXTENSIONS": ["jpg", "jpeg", "png", "gif"]
+})
+if app.config['STORAGE_PROVIDER'] == 'LOCAL':
+    app.config.update({
+        "STORAGE_CONTAINER": "./uploads",  # a directory path for local
+        "STORAGE_SERVER": False
+    })
+else:
+    app.config.update({
+        "STORAGE_KEY": os.environ['STORAGE_KEY'],
+        "STORAGE_SECRET": os.environ['STORAGE_SECRET'],
+        "STORAGE_CONTAINER": os.environ['STORAGE_CONTAINER'],  # bucket name of cloud
+    })
+storage = Storage()
+storage.init_app(app)
 
 
 @login_manager.user_loader
