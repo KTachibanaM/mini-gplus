@@ -36,9 +36,12 @@ app.config.update({
     "STORAGE_PROVIDER": os.environ.get('STORAGE_PROVIDER', 'LOCAL')
 })
 if app.config['STORAGE_PROVIDER'] == 'LOCAL':
+    if not os.path.exists('.uploads'):
+        os.mkdir('.uploads')
     app.config.update({
-        "STORAGE_CONTAINER": "./uploads",  # a directory path for local
-        "STORAGE_SERVER": False
+        "STORAGE_CONTAINER": ".uploads",  # a directory path for local
+        "STORAGE_SERVER": True,
+        "STORAGE_SERVER_URL": "/uploads",
     })
 else:
     app.config.update({
@@ -231,7 +234,18 @@ def settings():
 @app.route('/update-avatar', methods=['POST'])
 @login_required
 def update_avatar():
-    return redirect_back(request, url_for('index'))
+    # TODO: handle when the avatar_file is empty
+    avatar_file = request.files.get('avatar')
+    uploaded_file = storage.upload(avatar_file, random_name=True)
+    return redirect_back(request, url_for('settings'))
+
+
+@app.route('/avatar/<user_id>')
+@login_required
+def get_public_avatar(user_id):
+    avatar_file = storage.get('avatar-' + user_id)
+    url = avatar_file.full_url
+    return url
 
 
 @app.route('/profile/<user_id>')

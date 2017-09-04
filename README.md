@@ -16,5 +16,5 @@ An 8-hour worth of mini Google+ clone
         * Set `STORAGE_PROVIDER`, `STORAGE_KEY`, `STORAGE_SECRET`, `STORAGE_CONTAINER` env vars
     * Local dev
         * `STORAGE_PROVIDER=LOCAL`
-        * `STORAGE_CONTAINER=./uploads`
+        * `STORAGE_CONTAINER=.uploads`
         * `STORAGE_SERVER=False`
