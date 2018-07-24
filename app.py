@@ -203,6 +203,7 @@ def public_profile(user_id):
     profile_user = User.objects.get(user_id=user_id)
     return render_template('profile.jinja2', profile_user=profile_user, posts=user.sees_posts(profile_user))
 
+
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == 'c9':
         app.run(host='0.0.0.0', port=8080)
