@@ -1,6 +1,6 @@
 from flask import flash, redirect
 from wtforms.validators import Optional, DataRequired
-from urlparse import urlparse, urljoin
+from urllib.parse import urlparse, urljoin
 
 
 def flash_error(error_msg):
