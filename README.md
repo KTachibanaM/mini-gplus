@@ -10,7 +10,7 @@ Have a MongoDB running locally at `mongodb://localhost:27017`
 
 ```bash
 pip install -r requirements.txt
-python app.py
+FLASK_ENVIRONMENT=development python app.py
 ```
 
 View at [`http://localhost:5000`](http://localhost:5000/)

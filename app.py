@@ -9,6 +9,8 @@ import os
 import sys
 from pymongo.uri_parser import parse_uri
 from custom_exceptions import UnauthorizedAccess
+from flask_restful import Api
+from resources.user import UserList
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = urandom(24)
@@ -33,6 +35,7 @@ def load_user(loaded_id):
 @app.context_processor
 def inject_user():
     return dict(user=current_user)
+
 
 user = current_user  # type: User
 
@@ -204,8 +207,15 @@ def public_profile(user_id):
     return render_template('profile.jinja2', profile_user=profile_user, posts=user.sees_posts(profile_user))
 
 
+########
+# APIs #
+########
+app.config['BUNDLE_ERRORS'] = True
+api = Api(app)
+api.add_resource(UserList, '/api/user')
+
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == 'c9':
         app.run(host='0.0.0.0', port=8080)
     else:
-        app.run()
+        app.run(host='localhost', port=5000)
