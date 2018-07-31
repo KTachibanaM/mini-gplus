@@ -25,7 +25,7 @@ const SignIn = () => (
           <Segment>
             <Form.Input fluid placeholder='ID' />
             <Form.Input fluid placeholder='Password' type='password'/>
-            <Button fluid size='large'>
+            <Button primary fluid size='large'>
               Sign in
             </Button>
           </Segment>
