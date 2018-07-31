@@ -1,12 +1,15 @@
 import React, {Component} from 'react';
-import {Button, Grid, Header, Message, Segment} from 'semantic-ui-react'
+import {Button, Grid, Header, Message, Segment, Label} from 'semantic-ui-react'
 import {Form, Input} from 'formsy-semantic-ui-react'
 import {Link} from "react-router-dom";
+import axios from 'axios'
+require('promise.prototype.finally').shim();
 
 class SignUp extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      'error': '',
       'buttonEnabled': false,
       'loading': false
     }
@@ -17,8 +20,11 @@ class SignUp extends Component {
   handleFormInvalid = () => {
     this.setState({'buttonEnabled': false})
   }
+  showError = (message) => {
+    this.setState({'error': message})
+  }
   handleSubmit = (inputForm) => {
-    const { id, password, confirmPassword } = inputForm
+    const { 'id': id, 'password': password, 'confirmPassword': confirmPassword } = inputForm
     if (password !== confirmPassword) {
       this.refs.form.updateInputsWithError({
         'password': 'Password does not match',
@@ -27,8 +33,38 @@ class SignUp extends Component {
       return
     }
     this.setState({'loading': true})
+    axios.post(
+      'http://localhost:5000/api/user',
+      {
+        'id': id,
+        'password': password
+      }
+    ).then(res => {
+      if (res.status === 201) {
+        this.props.history.push('/signin')
+        return
+      }
+      this.showError(`Unknown response ${res}`)
+    }).catch(err => {
+      if (!err.response) {
+        this.showError(`Unknown error ${err}`)
+        return
+      }
+      const res = err.response
+      if (res.status === 409) {
+        this.refs.form.updateInputsWithError({
+          'id': 'id is already taken'
+        })
+        return
+      }
+      this.showError(`Unknown response ${res}`)
+    }).finally(() => {
+      this.setState({'loading': false})
+    })
   }
   render() {
+    const errorLabel = <Label color="red" pointing/>
+
     return (
       <div className='login-form'>
         <style>{`
@@ -37,7 +73,8 @@ class SignUp extends Component {
           body > div > div > div.login-form {
             height: 100%;
           }
-        `}</style>
+        `}
+        </style>
         <Grid textAlign='center' style={{height: '100%'}} verticalAlign='middle'>
           <Grid.Column style={{maxWidth: 450}}>
             <Header as='h2' textAlign='center'>
@@ -57,6 +94,7 @@ class SignUp extends Component {
                   name='id'
                   placeholder='ID'
                   required
+                  errorLabel={errorLabel}
                 />
                 <Input
                   fluid
@@ -64,6 +102,7 @@ class SignUp extends Component {
                   placeholder='Password'
                   type='password'
                   required
+                  errorLabel={errorLabel}
                 />
                 <Input
                   fluid
@@ -71,12 +110,16 @@ class SignUp extends Component {
                   placeholder='Confirm password'
                   type='password'
                   required
+                  errorLabel={errorLabel}
                 />
                 <Button fluid primary size='large' disabled={!this.state.buttonEnabled}>
                   Sign up
                 </Button>
               </Segment>
             </Form>
+            {this.state.error && <Message negative>
+              {this.state.error}
+            </Message>}
             <Message>
               Already have an account? <Link to='/signin'>Sign in here</Link>
             </Message>

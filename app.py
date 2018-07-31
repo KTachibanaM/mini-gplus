@@ -11,6 +11,7 @@ from pymongo.uri_parser import parse_uri
 from custom_exceptions import UnauthorizedAccess
 from flask_restful import Api
 from resources.user import UserList
+from flask_cors import CORS
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = urandom(24)
@@ -211,6 +212,8 @@ def public_profile(user_id):
 # APIs #
 ########
 app.config['BUNDLE_ERRORS'] = True
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 api = Api(app)
 api.add_resource(UserList, '/api/user')
 

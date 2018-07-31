@@ -9,8 +9,8 @@ user_parser.add_argument('password', type=str, required=True)
 class UserList(Resource):
     def post(self):
         args = user_parser.parse_args()
-        id_not_taken = DbUser.create(args['id'], args['password'])
-        if id_not_taken:
+        successful = DbUser.create(args['id'], args['password'])
+        if successful:
             return {'id': args['id']}, 201
         else:
             return {'message': {'id': 'id is already taken'}}, 409
