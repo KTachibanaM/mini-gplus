@@ -17,6 +17,7 @@ FLASK_ENVIRONMENT=development python app.py
 
 # Run web frontend
 cd web
+yarn install
 yarn start
 ```
 
