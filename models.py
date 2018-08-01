@@ -55,6 +55,21 @@ class User(Document, UserMixin):
         else:
             raise RuntimeError('More than one user for user id {} found!'.format(user_id))
 
+    @staticmethod
+    def find(user_id):
+        """
+        Finds the user
+        :param (str) user_id: user id
+        :return (User|bool): Whether the user exists
+        """
+        found_users = User.objects(user_id=user_id)
+        if not found_users:
+            return False
+        elif len(found_users) == 1:
+            return found_users[0]
+        else:
+            raise RuntimeError('More than one user for user id {} found!'.format(user_id))
+
     # Post
 
     def create_post(self, content, is_public, circles):

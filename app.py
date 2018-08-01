@@ -1,8 +1,9 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, jsonify
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms import SignupForm, SigninForm, CreateNewCircleForm, CreateNewPostForm
-from models import User, Circle, Post, Comment
+from models import User as DbUser
+from models import Circle, Post, Comment
 from utils import flash_error, redirect_back
 from os import urandom
 import os
@@ -10,8 +11,9 @@ import sys
 from pymongo.uri_parser import parse_uri
 from custom_exceptions import UnauthorizedAccess
 from flask_restful import Api
-from resources.user import UserList
+from resources.user import UserList, User
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager, create_access_token
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = urandom(24)
@@ -208,6 +210,30 @@ def public_profile(user_id):
     return render_template('profile.jinja2', profile_user=profile_user, posts=user.sees_posts(profile_user))
 
 
+##################
+# Authentication #
+##################
+app.config['JWT_SECRET_KEY'] = '123456'  # TODO: read from env
+JWTManager(app)
+
+
+@app.route('/api/auth', methods=['POST'])
+def auth():
+    if not request.is_json:
+        return jsonify({"message": "missing JSON in request"}), 400
+    id = request.json.get('id', None)
+    password = request.json.get('password', None)
+    if not id:
+        return jsonify({"message": {"id": "id is required"}}), 400
+    if not password:
+        return jsonify({"message": {"password": "password is required"}}), 400
+    user_checked = DbUser.check(id, password)
+    if not user_checked:
+        return jsonify({"message": "invalid id or password"}), 401
+    access_token = create_access_token(identity=id)
+    return jsonify(access_token=access_token), 200
+
+
 ########
 # APIs #
 ########
@@ -216,6 +242,7 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 api = Api(app)
 api.add_resource(UserList, '/api/user')
+api.add_resource(User, '/api/user/<id>')
 
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == 'c9':
