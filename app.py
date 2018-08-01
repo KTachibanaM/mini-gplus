@@ -32,7 +32,7 @@ app.session_interface = MongoEngineSessionInterface(db)
 
 @login_manager.user_loader
 def load_user(loaded_id):
-    return User.objects.get(id=loaded_id)
+    return DbUser.objects.get(id=loaded_id)
 
 
 @app.context_processor
@@ -56,7 +56,7 @@ def index():
 def signin():
     signin_form = SigninForm(request.form)
     if signin_form.validate():
-        found_user = User.check(signin_form.id.data, signin_form.password.data)
+        found_user = DbUser.check(signin_form.id.data, signin_form.password.data)
         if found_user:
             login_user(found_user, remember=True)
         else:
@@ -74,7 +74,7 @@ def signup():
 def add_user():
     signup_form = SignupForm(request.form)
     if signup_form.validate():
-        if User.create(signup_form.id.data, signup_form.password.data):
+        if DbUser.create(signup_form.id.data, signup_form.password.data):
             return redirect(url_for('index'))
         flash_error('id {} is already taken'.format(signup_form.id.data))
     signup_form.flash_all_errors()
@@ -163,7 +163,7 @@ def signout():
 def users():
     return render_template(
         'users.jinja2',
-        users=User.objects(id__ne=user.id),
+        users=DbUser.objects(id__ne=user.id),
         circles=Circle.objects(owner=user.id))
 
 
@@ -190,7 +190,7 @@ def add_circle():
 @login_required
 def toggle_member():
     circle = Circle.objects.get(id=request.form.get('circle_id'))  # type: Circle
-    toggled_user = User.objects.get(id=request.form.get('user_id'))
+    toggled_user = DbUser.objects.get(id=request.form.get('user_id'))
     user.toggle_member(circle, toggled_user)
     return redirect_back(request, url_for('index'))
 
@@ -206,7 +206,7 @@ def rm_circle():
 @app.route('/profile/<user_id>')
 @login_required
 def public_profile(user_id):
-    profile_user = User.objects.get(user_id=user_id)
+    profile_user = DbUser.objects.get(user_id=user_id)
     return render_template('profile.jinja2', profile_user=profile_user, posts=user.sees_posts(profile_user))
 
 
