@@ -6,7 +6,6 @@ import {
   Redirect
 } from 'react-router-dom'
 import AuthenticatedRoute from './Authentication/AuthenticatedRoute'
-import withAuthentication from './Authentication/withAuthentication'
 import SignIn from './Pages/SignIn'
 import SignUp from './Pages/SignUp'
 import Home from './Pages/Home'
@@ -19,7 +18,7 @@ export default class App extends Component {
           <AuthenticatedRoute
             exact={true}
             path='/'
-            component={withAuthentication(Home)}
+            component={Home}
           />
           <Route path="/signup" component={SignUp}/>
           <Route path="/signin" component={SignIn}/>

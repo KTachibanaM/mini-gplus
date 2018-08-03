@@ -3,6 +3,7 @@ import {Button, Grid, Header, Message, Segment, Label} from 'semantic-ui-react'
 import {Form, Input} from 'formsy-semantic-ui-react'
 import {Link, Redirect} from "react-router-dom";
 import axios from 'axios'
+
 require('promise.prototype.finally').shim();
 
 export default class SignUp extends Component {
@@ -15,6 +16,7 @@ export default class SignUp extends Component {
       'redirectToSignIn': false
     }
   }
+
   handleFormValid = () => {
     this.setState({'buttonEnabled': true})
   }
@@ -25,7 +27,7 @@ export default class SignUp extends Component {
     this.setState({'error': message})
   }
   handleSubmit = (inputForm) => {
-    const { 'id': id, 'password': password, 'confirmPassword': confirmPassword } = inputForm
+    const {'id': id, 'password': password, 'confirmPassword': confirmPassword} = inputForm
     if (password !== confirmPassword) {
       this.refs.form.updateInputsWithError({
         'password': 'Password does not match',
@@ -63,6 +65,7 @@ export default class SignUp extends Component {
       this.setState({'loading': false})
     })
   }
+
   render() {
     if (this.state.redirectToSignIn) {
       return <Redirect to={'/signin'}/>
@@ -117,7 +120,12 @@ export default class SignUp extends Component {
                   required
                   errorLabel={errorLabel}
                 />
-                <Button fluid primary size='large' disabled={!this.state.buttonEnabled}>
+                <Button
+                  fluid
+                  primary
+                  size='large'
+                  disabled={!this.state.buttonEnabled}
+                >
                   Sign up
                 </Button>
               </Segment>
