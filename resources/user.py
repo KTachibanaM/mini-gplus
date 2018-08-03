@@ -19,8 +19,6 @@ class UserList(Resource):
 
 class User(Resource):
     @jwt_required
-    def get(self, id):
+    def get(self):
         current_id = get_jwt_identity()
-        if current_id != id:
-            return {'message': 'unauthenticated'}, 401
         return {'id': current_id}, 200

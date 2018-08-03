@@ -1,17 +1,18 @@
 import React, {Component} from 'react';
 import {Button, Grid, Header, Message, Segment, Label} from 'semantic-ui-react'
 import {Form, Input} from 'formsy-semantic-ui-react'
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 import axios from 'axios'
 require('promise.prototype.finally').shim();
 
-class SignUp extends Component {
+export default class SignUp extends Component {
   constructor(props) {
     super(props)
     this.state = {
       'error': '',
       'buttonEnabled': false,
-      'loading': false
+      'loading': false,
+      'redirectToSignIn': false
     }
   }
   handleFormValid = () => {
@@ -34,14 +35,14 @@ class SignUp extends Component {
     }
     this.setState({'loading': true})
     axios.post(
-      'http://localhost:5000/api/user',
+      'http://localhost:5000/api/users',
       {
         'id': id,
         'password': password
       }
     ).then(res => {
       if (res.status === 201) {
-        this.props.history.push('/signin')
+        this.setState({'redirectToSignIn': true})
         return
       }
       this.showError(`Unknown response ${res}`)
@@ -63,6 +64,10 @@ class SignUp extends Component {
     })
   }
   render() {
+    if (this.state.redirectToSignIn) {
+      return <Redirect to={'/signin'}/>
+    }
+
     const errorLabel = <Label color="red" pointing/>
 
     return (
@@ -129,5 +134,3 @@ class SignUp extends Component {
     )
   }
 }
-
-export default SignUp

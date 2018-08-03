@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom'
 import {Button, Form, Grid, Header, Segment, Message} from "semantic-ui-react";
 
-const SignIn = () => (
+export default () => (
   <div className='login-form'>
     {/*
       Heads up! The styles below are necessary for the correct render of this example.
@@ -37,5 +37,3 @@ const SignIn = () => (
     </Grid>
   </div>
 )
-
-export default SignIn

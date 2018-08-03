@@ -214,6 +214,7 @@ def public_profile(user_id):
 # Authentication #
 ##################
 app.config['JWT_SECRET_KEY'] = '123456'  # TODO: read from env
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 JWTManager(app)
 
 
@@ -241,8 +242,8 @@ app.config['BUNDLE_ERRORS'] = True
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 api = Api(app)
-api.add_resource(UserList, '/api/user')
-api.add_resource(User, '/api/user/<id>')
+api.add_resource(UserList, '/api/users')
+api.add_resource(User, '/api/user')
 
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == 'c9':
