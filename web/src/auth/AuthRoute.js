@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {Route, Redirect} from 'react-router-dom'
-import {isAuthenticated, getAuthentication} from "./Authenticator";
+import {isAuthenticated, getAuthentication} from "./AuthCookie";
 
 export default ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) => (

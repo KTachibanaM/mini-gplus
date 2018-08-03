@@ -18,7 +18,7 @@ export const authenticate = (accessToken) => {
   cookies.set(CookieKey, accessToken, { path: CookiePath })
 }
 
-export const unauthenticate = () => {
+export const unAuthenticate = () => {
   const cookies = new Cookies();
-  cookies.set(CookieKey, undefined, { path: CookiePath })
+  cookies.remove(CookieKey, { path: CookiePath })
 }

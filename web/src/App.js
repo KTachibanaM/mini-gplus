@@ -5,10 +5,10 @@ import {
   Switch,
   Redirect
 } from 'react-router-dom'
-import AuthenticatedRoute from './Authentication/AuthenticatedRoute'
-import SignIn from './Pages/SignIn'
-import SignUp from './Pages/SignUp'
-import Home from './Pages/Home'
+import AuthenticatedRoute from './auth/AuthRoute'
+import SignIn from './pages/SignIn'
+import SignUp from './pages/SignUp'
+import Home from './pages/Home'
 
 export default class App extends Component {
   render() {
