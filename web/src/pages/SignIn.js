@@ -3,7 +3,7 @@ import {Link, Redirect} from 'react-router-dom'
 import {Button, Grid, Header, Segment, Message, Label} from "semantic-ui-react";
 import {Form, Input} from 'formsy-semantic-ui-react'
 import axios from 'axios'
-import {authenticate} from "../auth/AuthCookie";
+import {authenticate} from "../auth/cookie";
 
 require('promise.prototype.finally').shim();
 

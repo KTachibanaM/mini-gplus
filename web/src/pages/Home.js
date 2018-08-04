@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import axios from 'axios'
 import {Redirect} from 'react-router-dom'
-import {unAuthenticate} from "../auth/AuthCookie";
+import {unAuthenticate} from "../auth/cookie";
 require('promise.prototype.finally').shim();
 
 export default class Home extends Component {
