@@ -6,7 +6,7 @@ import {
   Redirect
 } from 'react-router-dom'
 import Api from './api/Api'
-import AuthenticatedRoute from './auth/AuthRoute'
+import withAuthRedirect from './hoc/withAuthRedirect'
 import withNavBar from './hoc/withNavBar'
 import withApi from './hoc/withApi'
 import SignIn from './pages/SignIn'
@@ -25,17 +25,17 @@ export default class App extends Component {
     return (
       <Router>
         <Switch>
-          <AuthenticatedRoute
+          <Route
             exact={true}
             path='/'
-            component={withNavBar(Home, '/')}
+            component={withAuthRedirect(withNavBar(Home, '/'))}
           />
           <Route path="/signup" component={withApi(SignUp, api)}/>
           <Route path="/signin" component={SignIn}/>
-          <AuthenticatedRoute path="/circles" component={withNavBar(Circles, '/circles')}/>
-          <AuthenticatedRoute path="/users" component={withNavBar(Users, '/users')}/>
-          <AuthenticatedRoute path="/profile" component={withNavBar(Profile, '/profile')}/>
-          <Redirect to='/' />
+          <Route path="/circles" component={withAuthRedirect(withNavBar(Circles, '/circles'))}/>
+          <Route path="/users" component={withAuthRedirect(withNavBar(Users, '/users'))}/>
+          <Route path="/profile" component={withAuthRedirect(withNavBar(Profile, '/profile'))}/>
+          <Redirect to='/'/>
         </Switch>
       </Router>
     );
