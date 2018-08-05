@@ -1,5 +1,6 @@
 import axios from 'axios'
 import ApiError from './ApiError'
+import {setCookie} from "./authCookie";
 require('promise.prototype.finally').shim();
 axios.defaults.validateStatus = () => {return true}
 
@@ -10,11 +11,17 @@ class ThenBuilder {
   }
 
   addResolve(statusCode, responseToData) {
+    if (responseToData === undefined) {
+      responseToData = () => {return undefined}
+    }
     this.resolves[statusCode] = responseToData
     return this
   }
 
   addReject(statusCode, responseToErr) {
+    if (responseToErr === undefined) {
+      responseToErr = () => {return undefined}
+    }
     this.rejects[statusCode] = responseToErr
     return this
   }
@@ -48,7 +55,7 @@ export default class Api {
         }
       ).then(
         new ThenBuilder()
-          .addResolve(201, () => {return undefined})
+          .addResolve(201)
           .addReject(409, () => {return new ApiError(409)})
           .build(resolve, reject)
       ).catch(err => {
@@ -58,7 +65,25 @@ export default class Api {
   }
 
   signIn(id, password) {
-
+    return new Promise((resolve, reject) => {
+      axios.post(
+        'http://localhost:5000/api/auth',
+        {
+          'id': id,
+          'password': password
+        }
+      ).then(
+        new ThenBuilder()
+          .addResolve(200, res => {
+            const accessToken = res.data['access_token']
+            setCookie(accessToken)
+          })
+          .addReject(401, () => {return new ApiError(401)})
+          .build(resolve, reject)
+      ).catch(err => {
+        reject(err)
+      })
+    })
   }
 
   getMe() {}

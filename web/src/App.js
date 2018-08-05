@@ -30,8 +30,14 @@ export default class App extends Component {
             path='/'
             component={withAuthRedirect(withNavBar(Home, '/'))}
           />
-          <Route path="/signup" component={withApi(SignUp, api)}/>
-          <Route path="/signin" component={SignIn}/>
+          <Route
+            path="/signup"
+            component={withApi(SignUp, api)}
+          />
+          <Route
+            path="/signin"
+            component={withApi(SignIn, api)}
+          />
           <Route path="/circles" component={withAuthRedirect(withNavBar(Circles, '/circles'))}/>
           <Route path="/users" component={withAuthRedirect(withNavBar(Users, '/users'))}/>
           <Route path="/profile" component={withAuthRedirect(withNavBar(Profile, '/profile'))}/>

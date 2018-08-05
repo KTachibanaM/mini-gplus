@@ -2,8 +2,7 @@ import React, {Component} from 'react';
 import {Link, Redirect} from 'react-router-dom'
 import {Button, Grid, Header, Segment, Message, Label} from "semantic-ui-react";
 import {Form, Input} from 'formsy-semantic-ui-react'
-import axios from 'axios'
-import {authenticate} from "../auth/cookie";
+import CatchApiErrorBuilder from '../api/CatchApiErrorBuilder'
 
 require('promise.prototype.finally').shim();
 
@@ -24,41 +23,29 @@ export default class SignIn extends Component {
   handleFormInvalid = () => {
     this.setState({'buttonEnabled': false})
   }
-  showError = (message) => {
-    this.setState({'error': message})
+  showError = (err) => {
+    this.setState({'error': err.toString()})
   }
   handleSubmit = (inputForm) => {
     const {'id': id, 'password': password} = inputForm
+
     this.setState({'loading': true})
-    axios.post(
-      'http://localhost:5000/api/auth',
-      {
-        'id': id,
-        'password': password
-      }
-    ).then(res => {
-      if (res.status === 200) {
-        const accessToken = res.data['access_token']
-        authenticate(accessToken)
-        this.setState({'redirectToHome': true})
-        return
-      }
-      this.showError(`Unknown response ${res}`)
-    }).catch(err => {
-      if (!err.response) {
-        this.showError(`Unknown error ${err}`)
-        return
-      }
-      const res = err.response
-      if (res.status === 401) {
-        this.refs.form.updateInputsWithError({
-          'id': 'invalid id or password',
-          'password': 'invalid id or password'
+    this.props.api.signIn(
+      id, password
+    ).then(() => {
+      this.setState({'redirectToHome': true})
+    }).catch(
+      new CatchApiErrorBuilder()
+        .handle(401, () => {
+          this.refs.form.updateInputsWithError({
+            'id': 'invalid id or password',
+            'password': 'invalid id or password'
+          })
         })
-        return
-      }
-      this.showError(`Unknown response ${res}`)
-    }).finally(() => {
+        .unknownError(this.showError)
+        .unknownStatusCode(this.showError)
+        .build()
+    ).finally(() => {
       this.setState({'loading': false})
     })
   }

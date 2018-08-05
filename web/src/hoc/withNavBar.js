@@ -8,7 +8,7 @@ import {
   MenuItem
 } from 'semantic-ui-react'
 import Logo from '../logo.png'
-import {unAuthenticate} from "../auth/cookie";
+import {removeCookie} from "../api/authCookie";
 
 export default (WrappedComponent, path) => {
   return class extends Component {
@@ -24,7 +24,7 @@ export default (WrappedComponent, path) => {
     }
 
     handleSignOut = () => {
-      unAuthenticate()
+      removeCookie()
       this.setState({'redirectTo': '/signin'})
     }
 
