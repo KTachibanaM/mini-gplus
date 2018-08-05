@@ -105,9 +105,11 @@ export default class SignIn extends Component {
                 </Button>
               </Segment>
             </Form>
-            {this.state.error && <Message negative>
-              {this.state.error}
-            </Message>}
+            {this.state.error &&
+              <Message negative>
+                {this.state.error}
+              </Message>
+            }
             <Message>
               Don't have an account? <Link to='/signup'>Sign up here</Link>
             </Message>

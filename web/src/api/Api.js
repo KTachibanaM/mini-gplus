@@ -1,6 +1,6 @@
 import axios from 'axios'
 import ApiError from './ApiError'
-import {setCookie} from "./authCookie";
+import {cookieExists, getCookie, setCookie} from "./authCookie";
 require('promise.prototype.finally').shim();
 axios.defaults.validateStatus = () => {return true}
 
@@ -67,7 +67,7 @@ export default class Api {
   signIn(id, password) {
     return new Promise((resolve, reject) => {
       axios.post(
-        'http://localhost:5000/api/auth',
+        `${this.endpoint}/auth`,
         {
           'id': id,
           'password': password
@@ -75,7 +75,7 @@ export default class Api {
       ).then(
         new ThenBuilder()
           .addResolve(200, res => {
-            const accessToken = res.data['access_token']
+            const {'access_token': accessToken} = res.data
             setCookie(accessToken)
           })
           .addReject(401, () => {return new ApiError(401)})
@@ -86,7 +86,44 @@ export default class Api {
     })
   }
 
-  getMe() {}
+  static rejectOnUnauthorized(rejectFunc) {
+    if (!cookieExists()) {
+      rejectFunc(new ApiError(401))
+      return true
+    } else {
+      return false
+    }
+  }
+
+  static authorizedHeaders() {
+    return {
+      'Authorization': `Bearer ${getCookie()}`
+    }
+  }
+
+  getMe() {
+    return new Promise((resolve, reject) => {
+      if (Api.rejectOnUnauthorized(reject)) {
+        return
+      }
+      axios.get(
+        `${this.endpoint}/me`,
+        {
+          headers: Api.authorizedHeaders()
+        }
+      ).then(
+        new ThenBuilder()
+          .addResolve(200, res => {
+            const {'id': id} = res.data
+            return {'id': id}
+          })
+          .addReject(401, () => {return new ApiError(401)})
+          .build(resolve, reject)
+      ).catch(err => {
+        reject(err)
+      })
+    })
+  }
 
   getUsers() {}
 }
