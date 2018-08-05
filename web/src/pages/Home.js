@@ -42,11 +42,6 @@ export default class Home extends Component {
     })
   }
 
-  handleSignOut = () => {
-    unAuthenticate()
-    this.setState({'redirectToSignIn': true})
-  }
-
   render() {
     if (this.state.redirectToSignIn) {
       return <Redirect to='/signin'/>
@@ -55,7 +50,6 @@ export default class Home extends Component {
     return (
       <div>
         <div>{this.state.id}</div>
-        <button onClick={this.handleSignOut}>SignOut</button>
       </div>
     )
   }

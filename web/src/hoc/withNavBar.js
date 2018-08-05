@@ -4,9 +4,11 @@ import {
   Container,
   Image,
   Menu,
-  Icon
+  Icon,
+  MenuItem
 } from 'semantic-ui-react'
 import Logo from '../logo.png'
+import {unAuthenticate} from "../auth/cookie";
 
 export default (WrappedComponent, path) => {
   return class extends Component {
@@ -21,6 +23,11 @@ export default (WrappedComponent, path) => {
       this.setState({'redirectTo': path})
     }
 
+    handleSignOut = () => {
+      unAuthenticate()
+      this.setState({'redirectTo': '/signin'})
+    }
+
     render() {
       if (this.state.redirectTo !== undefined && this.state.redirectTo !== path) {
         return <Redirect to={this.state.redirectTo}/>
@@ -29,40 +36,45 @@ export default (WrappedComponent, path) => {
       return (
         <div>
           <Menu fixed='top'>
-            <Menu.Item
+            <MenuItem
               as='a'
               onClick={() => {this.handleNavItemClick('/')}}
               active={path === '/'}
             >
               <Image size='mini' src={Logo} style={{ marginRight: '3em' }} />
               Home
-            </Menu.Item>
-            <Menu.Item
+            </MenuItem>
+            <MenuItem
               as='a'
               onClick={() => {this.handleNavItemClick('/circles')}}
               active={path === '/circles'}
             >
               Circles
-            </Menu.Item>
-            <Menu.Item
+            </MenuItem>
+            <MenuItem
               as='a'
               onClick={() => {this.handleNavItemClick('/users')}}
               active={path === '/users'}
             >
               Users
-            </Menu.Item>
-            <Menu.Item
+            </MenuItem>
+            <MenuItem
               as='a'
               onClick={() => {this.handleNavItemClick('/profile')}}
               active={path === '/profile'}
             >
               Profile
-            </Menu.Item>
+            </MenuItem>
             <Menu.Menu position='right'>
-              <Menu.Item as='a'>
+              <MenuItem as='a' size='large'>
                 <Icon name='bell outline'/>
-              </Menu.Item>
-              <Menu.Item as='a'>Sign out</Menu.Item>
+              </MenuItem>
+              <MenuItem
+                as='a'
+                onClick={() => {this.handleSignOut()}}
+              >
+                Sign out
+              </MenuItem>
             </Menu.Menu>
           </Menu>
           <Container style={{ marginTop: '5em' }}>

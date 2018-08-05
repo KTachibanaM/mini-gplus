@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Grid, Header, Message, Segment, Label} from 'semantic-ui-react'
+import {Button, Grid, Header, Message, Segment, Label, GridColumn} from 'semantic-ui-react'
 import {Form, Input} from 'formsy-semantic-ui-react'
 import {Link, Redirect} from "react-router-dom";
 import axios from 'axios'
@@ -84,7 +84,7 @@ export default class SignUp extends Component {
         `}
         </style>
         <Grid textAlign='center' style={{height: '100%'}} verticalAlign='middle'>
-          <Grid.Column style={{maxWidth: 450}}>
+          <GridColumn style={{maxWidth: 450}}>
             <Header as='h2' textAlign='center'>
               Sign up
             </Header>
@@ -136,7 +136,7 @@ export default class SignUp extends Component {
             <Message>
               Already have an account? <Link to='/signin'>Sign in here</Link>
             </Message>
-          </Grid.Column>
+          </GridColumn>
         </Grid>
       </div>
     )
