@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Button, Grid, Header, Message, Segment, Label, GridColumn} from 'semantic-ui-react'
 import {Form, Input} from 'formsy-semantic-ui-react'
 import {Link, Redirect} from "react-router-dom";
-import axios from 'axios'
+import CatchApiErrorBuilder from '../api/CatchApiErrorBuilder'
 
 require('promise.prototype.finally').shim();
 
@@ -23,8 +23,8 @@ export default class SignUp extends Component {
   handleFormInvalid = () => {
     this.setState({'buttonEnabled': false})
   }
-  showError = (message) => {
-    this.setState({'error': message})
+  showError = (err) => {
+    this.setState({'error': err.toString()})
   }
   handleSubmit = (inputForm) => {
     const {'id': id, 'password': password, 'confirmPassword': confirmPassword} = inputForm
@@ -35,33 +35,23 @@ export default class SignUp extends Component {
       })
       return
     }
+
     this.setState({'loading': true})
-    axios.post(
-      'http://localhost:5000/api/users',
-      {
-        'id': id,
-        'password': password
-      }
-    ).then(res => {
-      if (res.status === 201) {
-        this.setState({'redirectToSignIn': true})
-        return
-      }
-      this.showError(`Unknown response ${res}`)
-    }).catch(err => {
-      if (!err.response) {
-        this.showError(`Unknown error ${err}`)
-        return
-      }
-      const res = err.response
-      if (res.status === 409) {
-        this.refs.form.updateInputsWithError({
-          'id': 'id is already taken'
+    this.props.api.signUp(
+      id, password
+    ).then(() => {
+      this.setState({'redirectToSignIn': true})
+    }).catch(
+      new CatchApiErrorBuilder()
+        .handle(409, () => {
+          this.refs.form.updateInputsWithError(
+            {'id': 'id is already taken'}
+          )
         })
-        return
-      }
-      this.showError(`Unknown response ${res}`)
-    }).finally(() => {
+        .unknownError(this.showError)
+        .unknownStatusCode(this.showError)
+        .build()
+    ).finally(() => {
       this.setState({'loading': false})
     })
   }

@@ -11,7 +11,7 @@ import sys
 from pymongo.uri_parser import parse_uri
 from custom_exceptions import UnauthorizedAccess
 from flask_restful import Api
-from resources.user import UserList, User
+from resources.user import UserList, Me
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token
 
@@ -40,7 +40,7 @@ def inject_user():
     return dict(user=current_user)
 
 
-user = current_user  # type: User
+user = current_user  # type: Me
 
 
 @app.route('/')
@@ -243,7 +243,7 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 api = Api(app)
 api.add_resource(UserList, '/api/users')
-api.add_resource(User, '/api/user')
+api.add_resource(Me, '/api/me')
 
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == 'c9':

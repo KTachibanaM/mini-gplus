@@ -17,7 +17,7 @@ class UserList(Resource):
             return {'message': {'id': 'id is already taken'}}, 409
 
 
-class User(Resource):
+class Me(Resource):
     @jwt_required
     def get(self):
         current_id = get_jwt_identity()

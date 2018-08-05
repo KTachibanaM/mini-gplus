@@ -15,7 +15,7 @@ export default class Home extends Component {
 
   componentDidMount() {
     axios.get(
-      'http://localhost:5000/api/user',
+      'http://localhost:5000/api/me',
       {
         headers: {
           'Authorization': `Bearer ${this.props.authentication}`
