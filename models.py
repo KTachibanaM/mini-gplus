@@ -1,5 +1,6 @@
-from mongoengine import Document, ListField, BooleanField, ReferenceField, StringField, PULL, CASCADE, NotUniqueError
+import time
 from flask_login import UserMixin
+from mongoengine import Document, ListField, BooleanField, ReferenceField, StringField, PULL, CASCADE, NotUniqueError
 from werkzeug.security import generate_password_hash, check_password_hash
 from custom_exceptions import UnauthorizedAccess
 
@@ -9,8 +10,12 @@ class CreatedAtMixin(object):
     def created_at(self):
         return self.id.generation_time
 
+    @property
+    def created_at_unix_seconds(self):
+        return int(time.mktime(self.created_at.timetuple()))
 
-class User(Document, UserMixin):
+
+class User(Document, UserMixin, CreatedAtMixin):
     user_id = StringField(required=True, unique=True)
     password = StringField(required=True)
 

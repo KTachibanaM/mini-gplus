@@ -114,8 +114,7 @@ export default class Api {
       ).then(
         new ThenBuilder()
           .addResolve(200, res => {
-            const {'id': id} = res.data
-            return {'id': id}
+            return res.data
           })
           .addReject(401, () => {return new ApiError(401)})
           .build(resolve, reject)
@@ -125,7 +124,28 @@ export default class Api {
     })
   }
 
-  getUsers() {}
+  getUsers() {
+    return new Promise((resolve, reject) => {
+      if (Api.rejectOnUnauthorized(reject)) {
+        return
+      }
+      axios.get(
+        `${this.endpoint}/users`,
+        {
+          headers: Api.authorizedHeaders()
+        }
+      ).then(
+        new ThenBuilder()
+          .addResolve(200, res => {
+            return res.data
+          })
+          .addReject(401, () => {return new ApiError(401)})
+          .build(resolve, reject)
+      ).catch(err => {
+        reject(err)
+      })
+    })
+  }
 }
 
 

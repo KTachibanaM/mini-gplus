@@ -16,9 +16,18 @@ class UserList(Resource):
         else:
             return {'message': {'id': 'id is already taken'}}, 409
 
+    @jwt_required
+    def get(self):
+        user_id = get_jwt_identity()
+        other_users = [
+            {'id': user.user_id, 'createdAtSeconds': user.created_at_unix_seconds}
+            for user in DbUser.objects(user_id__ne=user_id)
+        ]
+        return other_users, 200
+
 
 class Me(Resource):
     @jwt_required
     def get(self):
-        current_id = get_jwt_identity()
-        return {'id': current_id}, 200
+        user_id = get_jwt_identity()
+        return {'id': user_id}, 200

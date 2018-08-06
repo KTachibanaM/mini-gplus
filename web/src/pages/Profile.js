@@ -10,8 +10,8 @@ export default class Profile extends Component {
     super(props)
     this.state = {
       'loading': true,
-      'data': undefined,
-      'error': undefined
+      'error': undefined,
+      'data': undefined
     }
   }
 
