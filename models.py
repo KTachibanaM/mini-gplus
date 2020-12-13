@@ -286,7 +286,7 @@ class Circle(Document):
         :param (User) user: checked user
         :return (bool): whether the user is in the circle
         """
-        return len(filter(lambda member: member.id == user.id, self.members)) != 0
+        return len(list(filter(lambda member: member.id == user.id, self.members))) != 0
 
 
 class Comment(Document, CreatedAtMixin):
